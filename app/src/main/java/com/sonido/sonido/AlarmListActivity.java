@@ -40,10 +40,13 @@ public class AlarmListActivity extends AppCompatActivity implements NavigationVi
     public static ListViewCustomAdapter alarmListAdapter;
     public String ALARM_LIST_STORAGE = "Alarm List Storage";
 
+    private static final String ACTIVITY_TAG = "AlarmListActivity"; // Used for logging purposes
+
     // Default activity onCreate method called when activity is created
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        Log.v(ACTIVITY_TAG, "1) Creating AlarmListActivity");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm_list);
 
@@ -52,11 +55,6 @@ public class AlarmListActivity extends AppCompatActivity implements NavigationVi
         */
         alarmListView = (ListView) findViewById(R.id.listView);
         alarmItems = new ArrayList<AlarmListItem>();
-
-        /*
-        *   Load all stored alarms for the user into alarmItems
-        * */
-        loadAlarmList();
 
         /*
         * Set up the CustomAdapter to display the alarmItems
@@ -85,20 +83,40 @@ public class AlarmListActivity extends AppCompatActivity implements NavigationVi
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        Log.v(ACTIVITY_TAG, "2) AlarmListActivity created");
+    }
+
+    // Called when application is started
+    @Override
+    protected void onStart()
+    {
+        Log.v(ACTIVITY_TAG, "1) Starting AlarmListActivity");
+        super.onStart();
+        Log.v(ACTIVITY_TAG, "2) AlarmListActivity started");
     }
 
     // Called when application is paused
     @Override
     protected void onPause()
     {
-        super.onPause();
+        Log.v(ACTIVITY_TAG, "Pausing AlarmListActivity");
         saveAlarmList(); // save the alarm list, either as the user is leaving temporarily or permanently
+        super.onPause();
+        Log.v(ACTIVITY_TAG, "AlarmListActivity paused");
     }
 
     // Called when application is resumed
     @Override
     protected void onResume()
     {
+        /*
+        * On resuming the activity, the alarmList is first re-loaded and we check if alarm has been added.
+        * If so, we add it to the alarmList. In any case, we force the adapter to update its values.
+        * */
+
+        Log.v(ACTIVITY_TAG, "1) Resuming AlarmListActivity");
+        loadAlarmList();
         super.onResume();
 
         /*
@@ -134,21 +152,25 @@ public class AlarmListActivity extends AppCompatActivity implements NavigationVi
 
             // Add to the alarm list, notify the adapter, and save the final list
             alarmItems.add(alarmItem);
-            alarmListAdapter.notifyDataSetChanged();
             saveAlarmList();
         }
+
+        alarmListAdapter.updateAlarmList(alarmItems);
+        Log.v(ACTIVITY_TAG, "2) AlarmListActivity resumed");
     }
 
     // Saves the alarm list data - uses internal storage
     public void saveAlarmList()
     {
         try {
+            Log.v(ACTIVITY_TAG, "1) Saving alarm list");
             FileOutputStream fos = openFileOutput(ALARM_LIST_STORAGE, Context.MODE_PRIVATE);
             ObjectOutputStream of = new ObjectOutputStream(fos);
             of.writeObject(alarmItems);
             of.flush();
             of.close();
             fos.close();
+            Log.v(ACTIVITY_TAG, "2) Alarm list saved - saved " + alarmItems.size() + " alarms");
         }
         catch (Exception e) {
             Log.e("InternalStorage", e.getMessage());
@@ -159,10 +181,14 @@ public class AlarmListActivity extends AppCompatActivity implements NavigationVi
     public void loadAlarmList()
     {
         try {
+
+            Log.v(ACTIVITY_TAG, "1) Loading alarm list");
             FileInputStream fis = openFileInput(ALARM_LIST_STORAGE);
             ObjectInputStream oi = new ObjectInputStream(fis);
             alarmItems = (ArrayList<AlarmListItem>) oi.readObject();
             oi.close();
+            Log.v(ACTIVITY_TAG, "2) Alarm list loaded - loaded " + alarmItems.size() + " alarms");
+
         } catch (FileNotFoundException e) {
             Log.e("InternalStorage", e.getMessage());
         } catch (IOException e) {

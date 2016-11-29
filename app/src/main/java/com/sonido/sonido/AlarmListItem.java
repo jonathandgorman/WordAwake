@@ -8,8 +8,10 @@ package com.sonido.sonido;
 * about the alarms created by the users.
 * ---------------------------------------------------------------------------------------------------------------*/
 
+import java.io.Serializable;
+
 // The details of the alarm list items which populate the list
-public class AlarmListItem
+public class AlarmListItem implements Serializable
 {
     // Primary alarm information
     public String alarmTime;

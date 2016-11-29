@@ -1,5 +1,7 @@
 package com.sonido.sonido;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import android.app.Activity;
 import android.content.Context;
@@ -48,33 +50,41 @@ public class ListViewCustomAdapter extends BaseAdapter
     public View getView(final int position, View convertView, ViewGroup parent)
     {
         View vi = convertView;
-        if(convertView == null)
-        {
-            // Inflate the view, and add the user alarm data for the new alarm view - then return it
-            vi = inflater.inflate(R.layout.alarm_list_item, null);
 
-            TextView alarmName = (TextView) vi.findViewById(R.id.alarmNameText);
-            alarmName.setText(items.get(position).alarmName);
+        // Inflate the view, and add the user alarm data for the new alarm view - then return it
+        vi = inflater.inflate(R.layout.alarm_list_item, null);
 
-            TextView alarmTime = (TextView) vi.findViewById(R.id.alarmTimeText);
-            alarmTime.setText(items.get(position).alarmTime);
+        TextView alarmName = (TextView) vi.findViewById(R.id.alarmNameText);
+        alarmName.setText(items.get(position).alarmName);
 
-            TextView activeDays = (TextView) vi.findViewById(R.id.activeDays);
-            activeDays.setText("Everyday");
+        TextView alarmTime = (TextView) vi.findViewById(R.id.alarmTimeText);
+        alarmTime.setText(items.get(position).alarmTime);
 
-            /*
-            CheckBox monday = (CheckBox) findViewById(R.id.mondayCheck);
-            CheckBox tuesday = (CheckBox) findViewById(R.id.tuesdayCheck);
-            CheckBox wednesday = (CheckBox) findViewById(R.id.wednesdayCheck);
-            CheckBox thursday = (CheckBox) findViewById(R.id.thursdayCheck);
-            CheckBox friday = (CheckBox) findViewById(R.id.fridayCheck);
-            CheckBox saturday = (CheckBox) findViewById(R.id.saturdayCheck);
-            CheckBox sunday = (CheckBox) findViewById(R.id.sundayCheck);
-            */
+        TextView activeDays = (TextView) vi.findViewById(R.id.activeDays);
+        activeDays.setText("Everyday");
 
-            Switch activateSwitch = (Switch) vi.findViewById(R.id.activatedSwitch);
-            activateSwitch.setChecked(items.get(position).activatedFlag);
-        }
+        /*
+        CheckBox monday = (CheckBox) findViewById(R.id.mondayCheck);
+        CheckBox tuesday = (CheckBox) findViewById(R.id.tuesdayCheck);
+        CheckBox wednesday = (CheckBox) findViewById(R.id.wednesdayCheck);
+        CheckBox thursday = (CheckBox) findViewById(R.id.thursdayCheck);
+        CheckBox friday = (CheckBox) findViewById(R.id.fridayCheck);
+        CheckBox saturday = (CheckBox) findViewById(R.id.saturdayCheck);
+        CheckBox sunday = (CheckBox) findViewById(R.id.sundayCheck);
+        */
+
+        Switch activateSwitch = (Switch) vi.findViewById(R.id.activatedSwitch);
+        activateSwitch.setChecked(items.get(position).activatedFlag);
+
         return vi;
     }
+
+    // Clears the current alarmList, and updates it with the argument alarmList
+    public void updateAlarmList(List<AlarmListItem> newAlarmList) {
+        items.clear();
+        Collections.reverse(Arrays.asList(newAlarmList)); // reverses the list order so that the user's last alarm remains in 1st position
+        items.addAll(newAlarmList);
+        this.notifyDataSetChanged();
+    }
+
 }
