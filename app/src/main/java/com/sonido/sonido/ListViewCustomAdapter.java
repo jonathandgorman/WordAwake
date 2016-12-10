@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -16,9 +18,9 @@ import android.widget.TextView;
 * Author: Jonathan Gorman
 * Date: 13/10/2016
 *
-* Description: A custom adapter which is used acts as a bridge betwene the user's alarm data, and the primary list
+* Description: A custom adapter which acts as a bridge between the user's alarm data, and the primary list
 * view of the application.
-* ---------------------------------------------------------------------------------------------------------------*/
+* ----------------------------------------------------------------+-----------------------------------------------*/
 
 public class ListViewCustomAdapter extends BaseAdapter
 {
@@ -60,29 +62,150 @@ public class ListViewCustomAdapter extends BaseAdapter
         TextView alarmTime = (TextView) vi.findViewById(R.id.alarmTimeText);
         alarmTime.setText(items.get(position).alarmTime);
 
+        // check to determine the alarms active days
         TextView activeDays = (TextView) vi.findViewById(R.id.activeDays);
-        activeDays.setText("Everyday");
 
-        /*
-        CheckBox monday = (CheckBox) findViewById(R.id.mondayCheck);
-        CheckBox tuesday = (CheckBox) findViewById(R.id.tuesdayCheck);
-        CheckBox wednesday = (CheckBox) findViewById(R.id.wednesdayCheck);
-        CheckBox thursday = (CheckBox) findViewById(R.id.thursdayCheck);
-        CheckBox friday = (CheckBox) findViewById(R.id.fridayCheck);
-        CheckBox saturday = (CheckBox) findViewById(R.id.saturdayCheck);
-        CheckBox sunday = (CheckBox) findViewById(R.id.sundayCheck);
-        */
+        // Check if everyday is chosen
+        if (items.get(position).mondayFlag && items.get(position).tuesdayFlag && items.get(position).wednesdayFlag
+                && items.get(position).thursdayFlag && items.get(position).fridayFlag && items.get(position).saturdayFlag
+                    && items.get(position).sundayFlag)
+        {
+            activeDays.setText("Everyday");
+        }
+        // Otherwise, check if all weekdays are chosen
+        else if (items.get(position).mondayFlag && items.get(position).tuesdayFlag && items.get(position).wednesdayFlag
+                && items.get(position).thursdayFlag && items.get(position).fridayFlag
+                && !items.get(position).saturdayFlag && !items.get(position).sundayFlag)
+        {
+            activeDays.setText("Weekdays");
 
+        }
+        // Otherwise, check if all weekends are chosen
+        else if (!items.get(position).mondayFlag && !items.get(position).tuesdayFlag && !items.get(position).wednesdayFlag
+                && !items.get(position).thursdayFlag && !items.get(position).fridayFlag
+                && items.get(position).saturdayFlag && items.get(position).sundayFlag)
+        {
+            activeDays.setText("Weekend");
+        }
+        else
+        {
+            // Else, individual days have been chosen and shown as a combo
+            String activeDaysText = "";
+            if (items.get(position).mondayFlag)
+            {activeDaysText = activeDaysText + "Mon ";}
+            if (items.get(position).tuesdayFlag)
+            {activeDaysText = activeDaysText + "Tue ";}
+            if (items.get(position).wednesdayFlag)
+            {activeDaysText = activeDaysText + "Wed ";}
+            if (items.get(position).thursdayFlag)
+            {activeDaysText = activeDaysText + "Thur ";}
+            if (items.get(position).fridayFlag)
+            {activeDaysText = activeDaysText + "Fri ";}
+            if (items.get(position).saturdayFlag)
+            {activeDaysText = activeDaysText + "Sat ";}
+            if (items.get(position).sundayFlag)
+            {activeDaysText = activeDaysText + "Sun ";}
+
+            activeDays.setText(activeDaysText);
+        }
+
+        // Then set the activated switch accordingly
         Switch activateSwitch = (Switch) vi.findViewById(R.id.activatedSwitch);
         activateSwitch.setChecked(items.get(position).activatedFlag);
 
+        if (items.get(position).initialLanguage != null)
+        {
+            // Set the language images
+            ImageButton initialLanguageImage = (ImageButton) vi.findViewById(R.id.alarmInitialLanguageSmall);
+            switch (items.get(position).initialLanguage) {
+                case "englishButton":
+                    initialLanguageImage.setImageResource(R.mipmap.englishiconsmall);
+                    break;
+                case "spanishButton":
+                    initialLanguageImage.setImageResource(R.mipmap.spanishiconsmall);
+                    break;
+                case "frenchButton":
+                    initialLanguageImage.setImageResource(R.mipmap.frenchiconsmall);
+                    break;
+                case "germanButton":
+                    initialLanguageImage.setImageResource(R.mipmap.germaniconsmall);
+                    break;
+                case "chineseButton":
+                    initialLanguageImage.setImageResource(R.mipmap.chineseiconsmall);
+                    break;
+                case "irishButton":
+                    initialLanguageImage.setImageResource(R.mipmap.irishiconsmall);
+                    break;
+                case "italianButton":
+                    initialLanguageImage.setImageResource(R.mipmap.italianiconsmall);
+                    break;
+                case "polishButton":
+                    initialLanguageImage.setImageResource(R.mipmap.polishiconsmall);
+                    break;
+                case "russianButton":
+                    initialLanguageImage.setImageResource(R.mipmap.russianiconsmall);
+                    break;
+                case "swedishButton":
+                    initialLanguageImage.setImageResource(R.mipmap.swedishiconsmall);
+                    break;
+                case "portugeseButton":
+                    initialLanguageImage.setImageResource(R.mipmap.portugeseiconsmall);
+                    break;
+                default:
+                    initialLanguageImage.setImageResource(R.mipmap.englishiconsmall);
+                    break;
+            }
+        }
+
+
+        if (items.get(position).targetLanguage != null) {
+            // Set the language images
+            ImageButton targetLanguageImage = (ImageButton) vi.findViewById(R.id.alarmTargetLanguageSmall);
+            switch (items.get(position).targetLanguage) {
+                case "englishButton":
+                    targetLanguageImage.setImageResource(R.mipmap.englishiconsmall);
+                    break;
+                case "spanishButton":
+                    targetLanguageImage.setImageResource(R.mipmap.spanishiconsmall);
+                    break;
+                case "frenchButton":
+                    targetLanguageImage.setImageResource(R.mipmap.frenchiconsmall);
+                    break;
+                case "germanButton":
+                    targetLanguageImage.setImageResource(R.mipmap.germaniconsmall);
+                    break;
+                case "chineseButton":
+                    targetLanguageImage.setImageResource(R.mipmap.chineseiconsmall);
+                    break;
+                case "irishButton":
+                    targetLanguageImage.setImageResource(R.mipmap.irishiconsmall);
+                    break;
+                case "italianButton":
+                    targetLanguageImage.setImageResource(R.mipmap.italianiconsmall);
+                    break;
+                case "polishButton":
+                    targetLanguageImage.setImageResource(R.mipmap.polishiconsmall);
+                    break;
+                case "russianButton":
+                    targetLanguageImage.setImageResource(R.mipmap.russianiconsmall);
+                    break;
+                case "swedishButton":
+                    targetLanguageImage.setImageResource(R.mipmap.swedishiconsmall);
+                    break;
+                case "portugeseButton":
+                    targetLanguageImage.setImageResource(R.mipmap.portugeseiconsmall);
+                    break;
+                default:
+                    targetLanguageImage.setImageResource(R.mipmap.spanishiconsmall);
+                    break;
+            }
+        }
         return vi;
     }
 
     // Clears the current alarmList, and updates it with the argument alarmList
     public void updateAlarmList(List<AlarmListItem> newAlarmList) {
         items.clear();
-        Collections.reverse(Arrays.asList(newAlarmList)); // reverses the list order so that the user's last alarm remains in 1st position
         items.addAll(newAlarmList);
         this.notifyDataSetChanged();
     }

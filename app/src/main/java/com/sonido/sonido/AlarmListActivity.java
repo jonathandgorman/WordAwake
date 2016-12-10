@@ -1,13 +1,10 @@
 package com.sonido.sonido;
 
+import android.app.AlarmManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -33,40 +30,46 @@ import java.util.ArrayList;
 *
 * ---------------------------------------------------------------------------------------------------------------*/
 
-public class AlarmListActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
+public class AlarmListActivity extends AppCompatActivity
 {
     public static ArrayList<AlarmListItem> alarmItems;
     public static ListView alarmListView;
     public static ListViewCustomAdapter alarmListAdapter;
     public String ALARM_LIST_STORAGE = "Alarm List Storage";
 
+    public transient static AlarmManager alarmManager;
+
     private static final String ACTIVITY_TAG = "AlarmListActivity"; // Used for logging purposes
 
     // Default activity onCreate method called when activity is created
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
-        Log.v(ACTIVITY_TAG, "1) Creating AlarmListActivity");
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_alarm_list);
+        setContentView(R.layout.app_bar_alarm_list);
 
         /*
-        *    Create the alarm list to hold AlarmListItems Objects
+        *   1)  Create the alarm list to hold AlarmListItems Objects
         */
         alarmListView = (ListView) findViewById(R.id.listView);
         alarmItems = new ArrayList<AlarmListItem>();
 
         /*
-        * Set up the CustomAdapter to display the alarmItems
-         */
+        * 2) Create ana alarmMnaager using the services which are only available in onCreate() method
+        */
+        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+        /*
+        *   2) Set up the CustomAdapter to display the alarmItems
+        */
         alarmListAdapter = new ListViewCustomAdapter(this, alarmItems);
         alarmListView.setAdapter(alarmListAdapter);
 
-        // Set up parts of the view
+        /*
+        *   3) Set up parts of the view - floating button and toolbar
+        */
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // This action button is used by the user to add another alarm, calls the
         FloatingActionButton addAlarmButton = (FloatingActionButton) findViewById(R.id.fab);
         addAlarmButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,48 +77,29 @@ public class AlarmListActivity extends AppCompatActivity implements NavigationVi
                 startActivity(new Intent(v.getContext(), SetAlarmActivity.class));
             }
         });
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        Log.v(ACTIVITY_TAG, "2) AlarmListActivity created");
     }
 
     // Called when application is started
     @Override
-    protected void onStart()
-    {
-        Log.v(ACTIVITY_TAG, "1) Starting AlarmListActivity");
+    protected void onStart() {
         super.onStart();
-        Log.v(ACTIVITY_TAG, "2) AlarmListActivity started");
     }
 
     // Called when application is paused
     @Override
-    protected void onPause()
-    {
-        Log.v(ACTIVITY_TAG, "Pausing AlarmListActivity");
+    protected void onPause() {
         saveAlarmList(); // save the alarm list, either as the user is leaving temporarily or permanently
         super.onPause();
-        Log.v(ACTIVITY_TAG, "AlarmListActivity paused");
     }
 
     // Called when application is resumed
     @Override
-    protected void onResume()
-    {
+    protected void onResume() {
+
         /*
         * On resuming the activity, the alarmList is first re-loaded and we check if alarm has been added.
         * If so, we add it to the alarmList. In any case, we force the adapter to update its values.
         * */
-
-        Log.v(ACTIVITY_TAG, "1) Resuming AlarmListActivity");
         loadAlarmList();
         super.onResume();
 
@@ -123,11 +107,12 @@ public class AlarmListActivity extends AppCompatActivity implements NavigationVi
         * Check if an intent has been received (only when coming from SetAlarm activity)
         */
         Intent intent = getIntent();
-        Bundle extras = intent.getExtras();
-        if (extras != null)
+        if (intent.hasExtra("TIME"))
         {
+            Bundle extras = intent.getExtras();
+
             // Create a new alarm item and add the alarm data
-            AlarmListItem alarmItem = new AlarmListItem();
+            AlarmListItem alarmItem = new AlarmListItem(alarmManager);
 
             // Take primary information
             alarmItem.alarmName = extras.getString("NAME");
@@ -151,19 +136,24 @@ public class AlarmListActivity extends AppCompatActivity implements NavigationVi
             alarmItem.fadeInFlag = extras.getBoolean("FADE");
 
             // Add to the alarm list, notify the adapter, and save the final list
-            alarmItems.add(alarmItem);
+            alarmItems.add(0, alarmItem); // Note,new element added to position "0"
             saveAlarmList();
+
+            setIntent(null); // set the intent to null
+
+            // If alarm is flagged to be activated, set the alarm
+            if (alarmItem.activatedFlag == true)
+            {
+                alarmItem.setAlarm();
+            }
         }
 
         alarmListAdapter.updateAlarmList(alarmItems);
-        Log.v(ACTIVITY_TAG, "2) AlarmListActivity resumed");
     }
 
     // Saves the alarm list data - uses internal storage
-    public void saveAlarmList()
-    {
+    public void saveAlarmList() {
         try {
-            Log.v(ACTIVITY_TAG, "1) Saving alarm list");
             FileOutputStream fos = openFileOutput(ALARM_LIST_STORAGE, Context.MODE_PRIVATE);
             ObjectOutputStream of = new ObjectOutputStream(fos);
             of.writeObject(alarmItems);
@@ -171,18 +161,33 @@ public class AlarmListActivity extends AppCompatActivity implements NavigationVi
             of.close();
             fos.close();
             Log.v(ACTIVITY_TAG, "2) Alarm list saved - saved " + alarmItems.size() + " alarms");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Log.e("InternalStorage", e.getMessage());
         }
     }
 
-    // Loads the alarm list data - uses internal storage
-    public void loadAlarmList()
-    {
+    // Saves the alarm list data - uses internal storage
+    public void resetAlarmList() {
         try {
+            FileOutputStream fos = openFileOutput(ALARM_LIST_STORAGE, Context.MODE_PRIVATE);
+            ObjectOutputStream of = new ObjectOutputStream(fos);
+            alarmItems.clear();
+            of.writeObject(alarmItems);
+            of.flush();
+            of.close();
+            fos.close();
+            Log.v(ACTIVITY_TAG, "2) Alarm list reset - currently " + alarmItems.size() + " alarms");
+        } catch (Exception e) {
+            Log.e("InternalStorage", e.getMessage());
+        }
 
-            Log.v(ACTIVITY_TAG, "1) Loading alarm list");
+        // Then notify the adapter that the list has changed
+        alarmListAdapter.updateAlarmList(alarmItems);
+    }
+
+    // Loads the alarm list data - uses internal storage
+    public void loadAlarmList() {
+        try {
             FileInputStream fis = openFileInput(ALARM_LIST_STORAGE);
             ObjectInputStream oi = new ObjectInputStream(fis);
             alarmItems = (ArrayList<AlarmListItem>) oi.readObject();
@@ -193,11 +198,75 @@ public class AlarmListActivity extends AppCompatActivity implements NavigationVi
             Log.e("InternalStorage", e.getMessage());
         } catch (IOException e) {
             Log.e("InternalStorage", e.getMessage());
-        }catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             Log.e("InternalStorage", e.getMessage());
         }
     }
 
+    // Overwritten function for view and layout
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.alarm_list, menu);
+        return true;
+    }
+
+    // Overwritten function for view and layout, gives access to menu and contained items
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+
+        if (id == R.id.action_settings)
+        {return true;}
+        if (id == R.id.action_about)
+        {return true;}
+        if (id == R.id.action_faq)
+        {return true;}
+
+        if (id == R.id.action_delete_all)
+        {
+            resetAlarmList();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        alarmListAdapter.updateAlarmList(alarmItems);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*
     // Overwritten function for view and layout
     @Override
     public void onBackPressed() {
@@ -208,27 +277,10 @@ public class AlarmListActivity extends AppCompatActivity implements NavigationVi
             super.onBackPressed();
         }
     }
+    */
 
-    // Overwritten function for view and layout
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
 
-        getMenuInflater().inflate(R.menu.alarm_list, menu);
-        return true;
-    }
-
-    // Overwritten function for view and layout
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
+/*
     // Overwritten function for view and layout
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -253,6 +305,17 @@ public class AlarmListActivity extends AppCompatActivity implements NavigationVi
         return true;
     }
 }
+
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        */
 
 
 

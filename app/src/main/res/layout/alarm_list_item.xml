@@ -1,31 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_height="fill_parent"
+    android:background="@color/primary_material_light"
+    android:backgroundTint="#4affffff"
+    android:backgroundTintMode="src_over">
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:id="@+id/ListItemLayout"
+        android:padding="5dp">
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:id="@+id/TopRowLayout">
 
             <LinearLayout
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:layout_weight="0.3">
+                android:layout_weight="1"
+                android:id="@+id/linearLayout"
+                android:layout_gravity="center"
+                android:gravity="center">
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/alarmTargetLanguageSmall"
+                    android:src="@mipmap/englishiconsmall"
+                    android:background="@null"
+                    android:layout_gravity="center" />
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/alarmInitialLanguageSmall"
+                    android:src="@mipmap/spanishiconsmall"
+                    android:background="@null"
+                    android:layout_gravity="center" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="0.5"
+                android:id="@+id/AlarmName"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:padding="10dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="Johnny&apos;s First Alarm!"
+                    android:text="07:00"
+                    android:id="@+id/alarmTimeText"
+                    android:textSize="35dp"
+                    android:layout_gravity="center_vertical|left" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Alarm Name"
                     android:id="@+id/alarmNameText"
+                    android:layout_gravity="center_vertical|left"
+                    android:textSize="20dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="Mon, Tue, Wed, Fri, Sat, Sun"
+                    android:id="@+id/activeDays"
                     android:layout_gravity="center_vertical|left" />
             </LinearLayout>
 
@@ -34,129 +88,35 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
-                android:gravity="right">
+                android:gravity="right"
+                android:id="@+id/ActivatedSwitchLayout"
+                android:layout_gravity="center_vertical">
 
                 <Switch
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
                     android:id="@+id/activatedSwitch"
-                    android:layout_gravity="center_vertical|right" />
+                    android:layout_gravity="center_vertical" />
             </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="07:00"
-                    android:id="@+id/alarmTimeText"
-                    android:layout_gravity="center_vertical|left" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1" >
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="Mon, Tue, Wed, Fri, Sat, Sun"
-                    android:id="@+id/activeDays"
-                    android:layout_gravity="center_vertical|right" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
 
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent" >
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:gravity="right"
+                android:id="@+id/AlarmSettingsLayout"
+                android:layout_gravity="center_vertical">
 
-                <LinearLayout
-                    android:orientation="horizontal"
+                <ImageButton
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
-                    android:layout_weight="1"
-                    android:gravity="center" >
-
-                    <ImageButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/initialLanguageImage"
-                        android:layout_gravity="center"
-                        android:src="@mipmap/englishi"
-                        android:background="@null" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_weight="1"
-                    android:gravity="center" >
-
-                    <ImageButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/targetLanguageImage"
-                        android:layout_gravity="center"
-                        android:src="@mipmap/spanishiconsmall"
-                        android:background="@null" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_weight="1"
-                    android:gravity="center" >
-
-                    <ImageButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/editAlarmButton"
-                        android:layout_gravity="center"
-                        android:background="@null"
-                        android:src="@android:drawable/ic_menu_edit" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_weight="1"
-                    android:gravity="center|top" >
-
-                    <ImageButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/deleteAlarmButton"
-                        android:layout_gravity="center"
-                        android:src="@android:drawable/ic_menu_delete"
-                        android:background="@null" />
-                </LinearLayout>
+                    android:id="@+id/imageButton"
+                    android:layout_gravity="center"
+                    android:src="@android:drawable/ic_menu_preferences"
+                    android:background="#00ffffff" />
             </LinearLayout>
+
         </LinearLayout>
 
     </LinearLayout>

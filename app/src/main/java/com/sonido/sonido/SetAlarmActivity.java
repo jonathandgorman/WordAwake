@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
@@ -35,8 +36,8 @@ public class SetAlarmActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState)
     {
         initialOrTargetChange = "initial"; // set to initial
-        initialLanguageName = "englishIcon"; // default initial language icon
-        targetLanguageName = "spanishIcon"; // default initial language icon
+        initialLanguageName = "englishButton"; // default initial language icon
+        targetLanguageName = "spanishButton"; // default initial language icon
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_alarm);
@@ -56,19 +57,24 @@ public class SetAlarmActivity extends AppCompatActivity {
         }
     }
 
-    // Create the alarm intent according to the users choices
+    // Create the alarm intent according to the users choices - the last part called after the user presses okay
     public void createAlarm()
     {
         //Second, intent to change activity to alarm list screen
         Intent setAlarmOk = new Intent(this, AlarmListActivity.class);
 
+        //Add primary alarm data
         EditText alarmName = (EditText) findViewById(R.id.alarmNameText);
         setAlarmOk.putExtra("NAME", alarmName.getText().toString());
         System.out.println("alarm name sent: " + alarmName.getText());
         EditText alarmTime = (EditText) findViewById(R.id.alarmTimeText);
         setAlarmOk.putExtra("TIME", alarmTime.getText().toString());
+
+        // Add chosen languages
         setAlarmOk.putExtra("INITIAL", initialLanguageName);
         setAlarmOk.putExtra("TARGET", targetLanguageName);
+
+        // Add active days data
         CheckBox monday = (CheckBox) findViewById(R.id.mondayCheck);
         setAlarmOk.putExtra("MONDAY", monday.isChecked());
         CheckBox tuesday = (CheckBox) findViewById(R.id.tuesdayCheck);
@@ -83,6 +89,8 @@ public class SetAlarmActivity extends AppCompatActivity {
         setAlarmOk.putExtra("SATURDAY", saturday.isChecked());
         CheckBox sunday = (CheckBox) findViewById(R.id.sundayCheck);
         setAlarmOk.putExtra("SUNDAY", sunday.isChecked());
+
+        // Add alarm options data
         Switch repeat = (Switch) findViewById(R.id.repeatSwitch);
         setAlarmOk.putExtra("REPEAT", repeat.isChecked());
         Switch vibrate = (Switch) findViewById(R.id.vibrateSwitch);
@@ -99,11 +107,11 @@ public class SetAlarmActivity extends AppCompatActivity {
     }
 
     // User has hit "CANCEL" to cancel their alarm - connected to "CANCEL" button
-    public void cancelAlarm(View v) {
+    public void cancelAlarm(View v)
+    {
         // Change activity to alarm list screen
         Intent setAlarmCancel = new Intent(this, AlarmListActivity.class);
         startActivity(setAlarmCancel);
-        System.out.println("Alarm has been not created");
     }
 
     // checks that the name field of the alarm is valid
@@ -178,19 +186,23 @@ public class SetAlarmActivity extends AppCompatActivity {
         answerName = true;
         checkDaysEmpty(); // positive response, check the the empty days
     }
+
     private void doOnCancelName()
     {
         answerName = false;
     }
+
     private void doOnOkDays()
     {
         answerDays = true;
         createAlarm();// teh second check is positive, create te alarm
     }
+
     private void doOnCancelDays()
     {
         answerDays = false;
     }
+
     // Call the dialog fragment which allows the use to select the time
     public void analogSetTime(View v) {
         DialogFragment timePickerFragment = new TimePickerFragment();

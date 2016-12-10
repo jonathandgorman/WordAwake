@@ -11,14 +11,14 @@
     android:theme="@style/ThemeOverlay.AppCompat.Dark"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.sonido.sonido.AlarmListActivity"
-    tools:showIn="@layout/app_bar_alarm_list">
-
+    tools:showIn="@layout/app_bar_alarm_list"
+    android:background="@android:color/background_light">
 
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:divider="#000000"
-        android:dividerHeight="4px"
+        android:divider="@android:color/background_light"
+        android:dividerHeight="25px"
         android:id="@+id/listView" />
 
 </RelativeLayout>
