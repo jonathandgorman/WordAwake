@@ -3,13 +3,9 @@
     package="com.sonido.sonido">
 
 
-    <!-- Receives bootup events, and will reset all alarms-->
-    <receiver android:name=".WordAwakeBootReceiver"
-        android:enabled="false">
-        <intent-filter>
-            <action android:name="android.intent.action.BOOT_COMPLETED"></action>
-        </intent-filter>
-    </receiver>
+    <uses-permission android:name="android.permission.SET_ALARM" /> <!-- required to set the alarm -->
+    <uses-permission android:name="android.permission.VIBRATE" /> <!-- required to access vibration functions -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" /> <!-- required to wake up the device from sleep -->
 
     <application
         android:allowBackup="true"
@@ -17,16 +13,33 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <!-- receiver used for alarms -->
+        <receiver android:name=".AlarmReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- main alarm list activity -->
         <activity
             android:name=".AlarmListActivity"
             android:label="@string/title_activity_alarm_list"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:launchMode="singleTop">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- activity used for setting an alarm -->
         <activity android:name=".SetAlarmActivity" />
+
+        <!-- activity that is started when the alarm sounds -->
+        <activity android:name=".AlarmSounding"></activity>
     </application>
 
 </manifest>

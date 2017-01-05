@@ -21,7 +21,8 @@
             android:layout_height="fill_parent"
             android:id="@+id/scrollView"
             android:layout_weight="1"
-            android:fillViewport="true">
+            android:fillViewport="true"
+            android:isScrollContainer="false"> <!-- ensures that soft keyboard does not change view -->
 
             <LinearLayout
                 android:id="@+id/defaultView"

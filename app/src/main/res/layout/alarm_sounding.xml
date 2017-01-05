@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/primaryLayout">
+
+        <TextView
+            android:text="07:00"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/currentTime"
+            android:layout_weight="0.2"
+            android:gravity="center"
+            android:textSize="64dp"
+            android:textStyle="normal|bold"
+            android:textColor="@android:color/background_dark" />
+
+        <Button
+            android:text="SNOOZE"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/snoozeButton"
+            android:width="1dp"
+            android:layout_weight="1"
+            android:textSize="32dp"
+            android:onClick="snoozeAlarm" />
+
+        <Button
+            android:text="DISMISS"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/dismissButton"
+            android:width="1dp"
+            android:layout_weight="0.2"
+            android:textSize="16dp"
+            android:onClick="dismissAlarm" />
+    </LinearLayout>
+
+</LinearLayout>

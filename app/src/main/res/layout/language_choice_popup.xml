@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical" android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="#00000000"
@@ -21,23 +23,23 @@
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/spanishButton"
-                android:src="@drawable/spanishicon"
-                android:clickable="true"
-                android:background="#00ffffff"
-                android:layout_gravity="center_horizontal"
-                android:contextClickable="true"
-                android:onClick="languageChange" />
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:id="@+id/englishButton"
                 android:src="@drawable/englishicon"
                 android:background="#00ffffff"
                 android:layout_gravity="center_horizontal"
                 android:clickable="true"
                 android:baselineAlignBottom="false"
+                android:contextClickable="true"
+                android:onClick="languageChange" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/spanishButton"
+                android:src="@drawable/spanishicon"
+                android:clickable="true"
+                android:background="#00ffffff"
+                android:layout_gravity="center_horizontal"
                 android:contextClickable="true"
                 android:onClick="languageChange" />
 
@@ -56,26 +58,6 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/germanButton"
                 android:src="@drawable/germanicon"
-                android:background="#00ffffff"
-                android:layout_gravity="center_horizontal"
-                android:clickable="true"
-                android:onClick="languageChange" />
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/chineseButton"
-                android:src="@drawable/chineseicon"
-                android:background="#00ffffff"
-                android:layout_gravity="center_horizontal"
-                android:clickable="true"
-                android:onClick="languageChange" />
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/irishButton"
-                android:src="@drawable/irishicon"
                 android:background="#00ffffff"
                 android:layout_gravity="center_horizontal"
                 android:clickable="true"
@@ -104,6 +86,16 @@
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:id="@+id/swedishButton"
+                android:src="@drawable/swedishicon"
+                android:background="#00ffffff"
+                android:layout_gravity="center_horizontal"
+                android:clickable="true"
+                android:onClick="languageChange" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:id="@+id/polishButton"
                 android:src="@drawable/polishicon"
                 android:background="#00ffffff"
@@ -114,8 +106,8 @@
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/russianButton"
-                android:src="@drawable/russianicon"
+                android:id="@+id/indianButton"
+                android:src="@drawable/indianicon"
                 android:background="#00ffffff"
                 android:layout_gravity="center_horizontal"
                 android:clickable="true"
@@ -124,8 +116,31 @@
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/swedishButton"
-                android:src="@drawable/swedishicon"
+                android:id="@+id/japaneseButton"
+                android:src="@drawable/japaneseicon"
+                android:clickable="true"
+                android:background="#00ffffff"
+                android:layout_gravity="center_horizontal"
+                android:contextClickable="true"
+                android:onClick="languageChange"
+                android:layout_weight="1"
+                tools:src="@drawable/japaneseicon" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/chineseButton"
+                android:src="@drawable/chineseicon"
+                android:background="#00ffffff"
+                android:layout_gravity="center_horizontal"
+                android:clickable="true"
+                android:onClick="languageChange" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/russianButton"
+                android:src="@drawable/russianicon"
                 android:background="#00ffffff"
                 android:layout_gravity="center_horizontal"
                 android:clickable="true"

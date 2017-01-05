@@ -36,15 +36,16 @@ public class AlarmListActivity extends AppCompatActivity
     public static ListView alarmListView;
     public static ListViewCustomAdapter alarmListAdapter;
     public String ALARM_LIST_STORAGE = "Alarm List Storage";
-
-    public transient static AlarmManager alarmManager;
-
     private static final String ACTIVITY_TAG = "AlarmListActivity"; // Used for logging purposes
+    public static AlarmManager alarmManager;
+    public Intent intentFromSetAlarm;
 
     // Default activity onCreate method called when activity is created
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
+        Log.d(ACTIVITY_TAG, "onCreate called in AlarmListActivity");
         setContentView(R.layout.app_bar_alarm_list);
 
         /*
@@ -54,18 +55,18 @@ public class AlarmListActivity extends AppCompatActivity
         alarmItems = new ArrayList<AlarmListItem>();
 
         /*
-        * 2) Create ana alarmMnaager using the services which are only available in onCreate() method
+        *   2)  Create an alarmManager using the system service that is provided with the context of the main activity class
         */
-        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE); // take the ALARM_SERVICE
 
         /*
-        *   2) Set up the CustomAdapter to display the alarmItems
+        *   4) Set up the CustomAdapter to display the alarmItems
         */
         alarmListAdapter = new ListViewCustomAdapter(this, alarmItems);
         alarmListView.setAdapter(alarmListAdapter);
 
         /*
-        *   3) Set up parts of the view - floating button and toolbar
+        *   5) Set up parts of the view - floating button and toolbar
         */
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -79,12 +80,6 @@ public class AlarmListActivity extends AppCompatActivity
         });
     }
 
-    // Called when application is started
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
     // Called when application is paused
     @Override
     protected void onPause() {
@@ -92,27 +87,21 @@ public class AlarmListActivity extends AppCompatActivity
         super.onPause();
     }
 
-    // Called when application is resumed
+    // As AlarmListActivity is singleTop - all received intents go through onNewIntent
     @Override
-    protected void onResume() {
+    protected void onNewIntent(Intent intent)
+    {
+        Log.d(ACTIVITY_TAG, "Entered onNewIntent");
+        super.onNewIntent(intent);
+        setIntent(intent); // this discards the original Intent
 
-        /*
-        * On resuming the activity, the alarmList is first re-loaded and we check if alarm has been added.
-        * If so, we add it to the alarmList. In any case, we force the adapter to update its values.
-        * */
-        loadAlarmList();
-        super.onResume();
-
-        /*
-        * Check if an intent has been received (only when coming from SetAlarm activity)
-        */
-        Intent intent = getIntent();
-        if (intent.hasExtra("TIME"))
+        if ((intent.getExtras() != null) && (intent.getStringExtra("TIME") != null))
         {
+            Log.d(ACTIVITY_TAG, "Intent received, creating new alarm");
             Bundle extras = intent.getExtras();
 
             // Create a new alarm item and add the alarm data
-            AlarmListItem alarmItem = new AlarmListItem(alarmManager);
+            AlarmListItem alarmItem = new AlarmListItem(this.getApplicationContext(), this.alarmManager);
 
             // Take primary information
             alarmItem.alarmName = extras.getString("NAME");
@@ -139,15 +128,22 @@ public class AlarmListActivity extends AppCompatActivity
             alarmItems.add(0, alarmItem); // Note,new element added to position "0"
             saveAlarmList();
 
-            setIntent(null); // set the intent to null
-
             // If alarm is flagged to be activated, set the alarm
             if (alarmItem.activatedFlag == true)
             {
                 alarmItem.setAlarm();
             }
         }
+        alarmListAdapter.updateAlarmList(alarmItems);
+    }
 
+    // Called when application is resumed
+    @Override
+    protected void onResume()
+    {
+        Log.d(ACTIVITY_TAG, "onResume called in AlarmListActivity");
+        super.onResume();
+        loadAlarmList();
         alarmListAdapter.updateAlarmList(alarmItems);
     }
 
@@ -232,92 +228,13 @@ public class AlarmListActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        alarmListAdapter.updateAlarmList(alarmItems);
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /*
-    // Overwritten function for view and layout
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
+        The back button has been suppressed from the main activity - this ensures that any intents are not re-received from the setAlarm activity.
+        Also, the update to the alarmList ensures that an older alarmList cannot be mistakenly viewed
     */
-
-
-/*
-    // Overwritten function for view and layout
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-
-        int id = item.getItemId();
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
+    public void onBackPressed()
+    {
+        super.onBackPressed();
     }
 }
-
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        */
-
-
-
-
-

@@ -1,7 +1,5 @@
 package com.sonido.sonido;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import android.app.Activity;
 import android.content.Context;
@@ -9,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -133,8 +130,8 @@ public class ListViewCustomAdapter extends BaseAdapter
                 case "chineseButton":
                     initialLanguageImage.setImageResource(R.mipmap.chineseiconsmall);
                     break;
-                case "irishButton":
-                    initialLanguageImage.setImageResource(R.mipmap.irishiconsmall);
+                case "indianButton":
+                    initialLanguageImage.setImageResource(R.mipmap.indianiconsmall);
                     break;
                 case "italianButton":
                     initialLanguageImage.setImageResource(R.mipmap.italianiconsmall);
@@ -151,8 +148,11 @@ public class ListViewCustomAdapter extends BaseAdapter
                 case "portugeseButton":
                     initialLanguageImage.setImageResource(R.mipmap.portugeseiconsmall);
                     break;
+                case "japaneseButton":
+                    initialLanguageImage.setImageResource(R.mipmap.japaneseiconsmall);
+                    break;
                 default:
-                    initialLanguageImage.setImageResource(R.mipmap.englishiconsmall);
+                    initialLanguageImage.setImageResource(R.mipmap.irishiconsmall);
                     break;
             }
         }
@@ -177,8 +177,8 @@ public class ListViewCustomAdapter extends BaseAdapter
                 case "chineseButton":
                     targetLanguageImage.setImageResource(R.mipmap.chineseiconsmall);
                     break;
-                case "irishButton":
-                    targetLanguageImage.setImageResource(R.mipmap.irishiconsmall);
+                case "indianButton":
+                    targetLanguageImage.setImageResource(R.mipmap.indianiconsmall);
                     break;
                 case "italianButton":
                     targetLanguageImage.setImageResource(R.mipmap.italianiconsmall);
@@ -195,8 +195,11 @@ public class ListViewCustomAdapter extends BaseAdapter
                 case "portugeseButton":
                     targetLanguageImage.setImageResource(R.mipmap.portugeseiconsmall);
                     break;
+                case "japaneseButton":
+                    targetLanguageImage.setImageResource(R.mipmap.japaneseiconsmall);
+                    break;
                 default:
-                    targetLanguageImage.setImageResource(R.mipmap.spanishiconsmall);
+                    targetLanguageImage.setImageResource(R.mipmap.irishiconsmall);
                     break;
             }
         }

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
@@ -14,6 +13,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Switch;
+import android.widget.TextView;
+import java.util.Calendar;
+
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 /*----------------------------------------------------------------------------------------------------------------
 * Author: Jonathan Gorman
@@ -35,12 +39,31 @@ public class SetAlarmActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        // Set default values upon creation
         initialOrTargetChange = "initial"; // set to initial
         initialLanguageName = "englishButton"; // default initial language icon
         targetLanguageName = "spanishButton"; // default initial language icon
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_alarm);
+
+        // Give the default time as the current system time
+        final Calendar deviceCalendar = Calendar.getInstance();
+        String hour = String.valueOf(deviceCalendar.get(Calendar.HOUR_OF_DAY));
+        String minute = String.valueOf(deviceCalendar.get(Calendar.MINUTE));
+        TextView timeTextView = (TextView) findViewById(R.id.alarmTimeText);
+
+        // In the case that hour or minute is equal to "0" or is less than "10" and will not display correctly
+        if (hour.equals("0"))
+        {hour = "00";}
+        else if (Integer.valueOf(hour) < 10)
+        {hour = "0" + hour;}
+        if (minute.equals("0"))
+        {minute = "00";}
+        else if (Integer.valueOf(minute) < 10)
+        {minute = "0" + minute;}
+
+        timeTextView.setText(hour + ":" + minute);
     }
 
     // Called when the user has hit "OK" to create their alarm
@@ -103,6 +126,7 @@ public class SetAlarmActivity extends AppCompatActivity {
         setAlarmOk.putExtra("VOLUME", volume.getProgress());
         setAlarmOk.putExtra("DURATION","5 Mins");
 
+        setAlarmOk.setFlags(FLAG_ACTIVITY_CLEAR_TOP); // Note, this FLAG_ACTIVITY_CLEAR_TOP flag will ensure that the older AlarmListActivity will receive the intent and be updated. All other activitie above it, including this, will be destroyed
         startActivity(setAlarmOk);
     }
 
@@ -262,8 +286,8 @@ public class SetAlarmActivity extends AppCompatActivity {
                 img.setImageResource(R.drawable.germanicon);
                 alert.dismiss();
                 break;
-            case "irishButton":
-                img.setImageResource(R.drawable.irishicon);
+            case "indianButton":
+                img.setImageResource(R.drawable.indianicon);
                 alert.dismiss();
                 break;
             case "russianButton":
