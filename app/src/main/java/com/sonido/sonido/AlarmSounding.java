@@ -65,8 +65,12 @@ public class AlarmSounding extends AppCompatActivity implements TextToSpeech.OnI
         setContentView(R.layout.alarm_sounding);
         TextView currentTimeText = (TextView) findViewById(R.id.currentTime);
         Calendar currCal = Calendar.getInstance();
-        int hour = currCal.get(Calendar.HOUR_OF_DAY); // HOUR_OF_DAY ensures 24 hour clock is used
-        int minute = currCal.get(Calendar.MINUTE);
+        String hour = String.valueOf(currCal.get(Calendar.HOUR_OF_DAY)); // HOUR_OF_DAY ensures 24 hour clock is used
+        String minute = String.valueOf(currCal.get(Calendar.MINUTE));
+        if (Integer.valueOf(hour) < 10)
+        {hour = "0" + String.valueOf(hour);}
+        if (Integer.valueOf(minute) < 10)
+        {minute = "0" + String.valueOf(minute);}
         currentTimeText.setText(hour + ":" + minute);
 
         tts = new TextToSpeech(AlarmSounding.this , this);

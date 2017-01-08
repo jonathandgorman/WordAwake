@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.SET_ALARM" /> <!-- required to set the alarm -->
     <uses-permission android:name="android.permission.VIBRATE" /> <!-- required to access vibration functions -->
     <uses-permission android:name="android.permission.WAKE_LOCK" /> <!-- required to wake up the device from sleep -->
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- required to access translations -->
 
     <application
         android:allowBackup="true"

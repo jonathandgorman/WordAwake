@@ -49,8 +49,8 @@ public class AlarmListItem extends AppCompatActivity implements Serializable
     // Audio strings
     private String startPhrase;
     private String endPhrase;
-    private String initialWordOfDay;
-    private String targetWordOfDay;
+    private String initialWordOfDay = null;
+    private String targetWordOfDay = null;
 
     // Non serializable members
     transient public PendingIntent pendingAlarmIntent; // pending intent used to sound alarm
@@ -102,49 +102,55 @@ public class AlarmListItem extends AppCompatActivity implements Serializable
         long numberOfHours = ((timeDifference/1000)%86400)/3600;
         long numberOfMinutes = (((timeDifference/1000)%86400)%3600)/60;
 
+        String wordOfday = new WordOfDayGenerator().genWord();
+
         // Assign audio file strings to send in intent
-        AudioGenerator audioGen = new AudioGenerator(initialLanguage, targetLanguage, "banana");
+        AudioGenerator audioGen = new AudioGenerator(initialLanguage, targetLanguage, wordOfday);
         startPhrase = audioGen.GenStartPhrase();
         endPhrase = audioGen.GenEndPhrase();
         initialWordOfDay = audioGen.GenInitialWord();
         targetWordOfDay = audioGen.GenEndWord();
 
-        // Create intent and add any information that is required at the RX to the intent
-        intent = new Intent(this.context, AlarmReceiver.class); //Intent to AlarmReciever class
-        ArrayList<String> activeAlarmDays = new ArrayList<String>();
-        activeAlarmDays.add(String.valueOf(sundayFlag));
-        activeAlarmDays.add(String.valueOf(mondayFlag));
-        activeAlarmDays.add(String.valueOf(tuesdayFlag));
-        activeAlarmDays.add(String.valueOf(wednesdayFlag));
-        activeAlarmDays.add(String.valueOf(thursdayFlag));
-        activeAlarmDays.add(String.valueOf(fridayFlag));
-        activeAlarmDays.add(String.valueOf(saturdayFlag));
 
-        intent.putExtra("ACTIVE_ALARM_DAYS", activeAlarmDays);
-        intent.putExtra("START_PHRASE", startPhrase);
-        intent.putExtra("END_PHRASE", endPhrase);
-        intent.putExtra("INITIAL_WORD", initialWordOfDay);
-        intent.putExtra("TARGET_WORD", targetWordOfDay);
-        intent.putExtra("INITIAL_LANGUAGE", initialLanguage);
-        intent.putExtra("TARGET_LANGUAGE", targetLanguage);
+        if (!initialWordOfDay.equals("ERROR") && !targetWordOfDay.equals("ERROR"))
+        {
+            // Create intent and add any information that is required at the RX to the intent
+            intent = new Intent(this.context, AlarmReceiver.class); //Intent to AlarmReceiver class
+            ArrayList<String> activeAlarmDays = new ArrayList<String>();
+            activeAlarmDays.add(String.valueOf(sundayFlag));
+            activeAlarmDays.add(String.valueOf(mondayFlag));
+            activeAlarmDays.add(String.valueOf(tuesdayFlag));
+            activeAlarmDays.add(String.valueOf(wednesdayFlag));
+            activeAlarmDays.add(String.valueOf(thursdayFlag));
+            activeAlarmDays.add(String.valueOf(fridayFlag));
+            activeAlarmDays.add(String.valueOf(saturdayFlag));
 
-        Log.d("ALARM_PHRASE_DATA", "DATA: " + startPhrase + "," + endPhrase + "," + initialWordOfDay + "," + targetWordOfDay + "," + initialLanguage + "," + targetLanguage);
+            intent.putExtra("ACTIVE_ALARM_DAYS", activeAlarmDays);
+            intent.putExtra("START_PHRASE", startPhrase);
+            intent.putExtra("END_PHRASE", endPhrase);
+            intent.putExtra("INITIAL_WORD", initialWordOfDay);
+            intent.putExtra("TARGET_WORD", targetWordOfDay);
+            intent.putExtra("INITIAL_LANGUAGE", initialLanguage);
+            intent.putExtra("TARGET_LANGUAGE", targetLanguage);
 
-        // Add intent to pendingIntent and ensure that it is only set once - and then just updated
-        pendingAlarmIntent = PendingIntent.getBroadcast(this.context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            Log.d("ALARM_PHRASE_DATA", "DATA: " + startPhrase + ", " + endPhrase + ", " + initialWordOfDay + ", " + targetWordOfDay + ", " + initialLanguage + ", " + targetLanguage);
 
-        // Alarm is scheduled to sound at EXACTLY the time mentioned and WAKEUP the device, then REPEATING at the shown interval
-        this.alarmManager.set(AlarmManager.RTC_WAKEUP,
-                alarmCalendar.getTimeInMillis(),
+            // Add intent to pendingIntent and ensure that it is only set once - and then just updated
+            pendingAlarmIntent = PendingIntent.getBroadcast(this.context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            // Alarm is scheduled to sound at EXACTLY the time mentioned and WAKEUP the device, then REPEATING at the shown interval
+            this.alarmManager.set(AlarmManager.RTC_WAKEUP,
+                    alarmCalendar.getTimeInMillis(),
                     pendingAlarmIntent);
 
-        // Create a toast notification to say that the alarm is activated and when it will activate
-       if (numberOfDays > 0)
-       {Toast.makeText(context, "Activated alarm will sound in " + numberOfDays + " Days " + numberOfHours + " Hours " + "and " + numberOfMinutes + " Minutes" , Toast.LENGTH_LONG).show();}
-       else if (numberOfMinutes > 0)
-       {Toast.makeText(context, "Activated alarm will sound in " + numberOfHours + " Hours " + "and " + numberOfMinutes + " Minutes" , Toast.LENGTH_LONG).show();}
-       else
-       {Toast.makeText(context, "Activated alarm will sound in " + numberOfMinutes + " Minutes" , Toast.LENGTH_LONG).show();}
+            // Create a toast notification to say that the alarm is activated and when it will activate
+            if (numberOfDays > 0)
+            {Toast.makeText(context, "Activated alarm will sound in " + numberOfDays + " Days " + numberOfHours + " Hours " + "and " + numberOfMinutes + " Minutes" , Toast.LENGTH_LONG).show();}
+            else if (numberOfMinutes > 0)
+            {Toast.makeText(context, "Activated alarm will sound in " + numberOfHours + " Hours " + "and " + numberOfMinutes + " Minutes" , Toast.LENGTH_LONG).show();}
+            else
+            {Toast.makeText(context, "Activated alarm will sound in " + numberOfMinutes + " Minutes" , Toast.LENGTH_LONG).show();}
+        }
     }
 
     // Cancels the alarms pending intent, cancelling the alarm ...

@@ -1,27 +1,32 @@
 package com.sonido.sonido;
 
+import android.util.Log;
+
+import java.io.UnsupportedEncodingException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class AudioGenerator {
 
-    private String initialLanguage;
-    private String targetLanguage;
+    public String initialLanguage;
+    public String targetLanguage;
+    public String wordOfDay;
 
-    AudioGenerator(String initialLanguage, String targetLanguage, String wordOfDay)
-    {
+    AudioGenerator(String initialLanguage, String targetLanguage, String wordOfDay) {
         this.initialLanguage = initialLanguage;
         this.targetLanguage = targetLanguage;
+        this.wordOfDay = wordOfDay;
     }
 
     // Generates the start phrase - E.G. Good Morning. The word of the day in _______ is:
-    String GenStartPhrase()
-    {
+    String GenStartPhrase() {
         String returnPhrase = "";
         switch (initialLanguage) {
             case "englishButton":
                 returnPhrase = "Good morning. The word of the day is: ";
                 break;
             case "spanishButton":
-                returnPhrase = "Buenas dias. La palabra del dia es: ";
+                returnPhrase = "Buenos dias. La palabra del dia es: ";
                 break;
             case "swedishButton":
                 returnPhrase = "God morgon. Ordet för dagen är: ";
@@ -54,13 +59,13 @@ public class AudioGenerator {
                 returnPhrase = "Buongiorno. La parola del giorno è il seguente:";
                 break;
             default:
-                throw new IllegalArgumentException("Error - Invalid language chosen: " + initialLanguage); }
+                throw new IllegalArgumentException("Error - Invalid language chosen: " + initialLanguage);
+        }
         return returnPhrase;
     }
 
     // Generates the end phrase - E.G. Which means ...
-    String GenEndPhrase()
-    {
+    String GenEndPhrase() {
         String returnPhrase = "";
         switch (initialLanguage) {
             case "englishButton":
@@ -73,77 +78,31 @@ public class AudioGenerator {
                 returnPhrase = "Som betyder: ";
                 break;
             case "frenchButton":
-                returnPhrase = "Ce qui signifie:";
+                returnPhrase = "Ce qui signifie: ";
                 break;
             case "germanButton":
-                returnPhrase = "Was bedeutet:";
+                returnPhrase = "Was bedeutet: ";
                 break;
             case "indianButton":
-                returnPhrase = "जिसका मतलब है:";
+                returnPhrase = "जिसका मतलब है: ";
                 break;
             case "russianButton":
-                returnPhrase = "Что значит:";
+                returnPhrase = "Что значит: ";
                 break;
             case "chineseButton":
-                returnPhrase = "意思是:";
+                returnPhrase = "意思是: ";
                 break;
             case "japaneseButton":
-                returnPhrase = "つまり:";
+                returnPhrase = "つまり: ";
                 break;
             case "portugeseButton":
-                returnPhrase = "Que significa:";
+                returnPhrase = "Que significa: ";
                 break;
             case "polishButton":
-                returnPhrase = "Co znaczy:";
+                returnPhrase = "Co znaczy: ";
                 break;
             case "italianButton":
-                returnPhrase = "Che significa:";
-                break;
-            default:
-                throw new IllegalArgumentException("Error - Invalid language chosen: " + initialLanguage); }
-        return returnPhrase;
-    }
-
-    // Generates the initial word - in the initial language
-    String GenInitialWord()
-    {
-        String returnPhrase = "";
-        switch (initialLanguage) {
-            case "englishButton":
-                returnPhrase = "The Banana";
-                break;
-            case "spanishButton":
-                returnPhrase = "El Platano";
-                break;
-            case "swedishButton":
-                returnPhrase = "Bananen";
-                break;
-            case "frenchButton":
-                returnPhrase = "La banane";
-                break;
-            case "germanButton":
-                returnPhrase = "Die Banane";
-                break;
-            case "indianButton":
-                returnPhrase = "केला";
-                break;
-            case "russianButton":
-                returnPhrase = "Банан";
-                break;
-            case "chineseButton":
-                returnPhrase = "香蕉";
-                break;
-            case "japaneseButton":
-                returnPhrase = "バナナ";
-                break;
-            case "portugeseButton":
-                returnPhrase = "A banana";
-                break;
-            case "polishButton":
-                returnPhrase = "banan";
-                break;
-            case "italianButton":
-                returnPhrase = "La banana";
+                returnPhrase = "Che significa: ";
                 break;
             default:
                 throw new IllegalArgumentException("Error - Invalid language chosen: " + initialLanguage);
@@ -151,50 +110,205 @@ public class AudioGenerator {
         return returnPhrase;
     }
 
+    // Generates the initial word - in the initial language
+    String GenInitialWord()
+    {
+        TranslatorRunnable runnable = null;
+        Thread thread;
+
+        String returnPhraseUnicode = "";
+        switch (initialLanguage) {
+            case "englishButton":
+                returnPhraseUnicode = wordOfDay;
+                break;
+            case "spanishButton":
+                runnable = new TranslatorRunnable(wordOfDay,initialLanguage);
+                thread = new Thread(runnable);
+                thread.start();
+                returnPhraseUnicode = runnable.getTranslatedText();
+                break;
+            case "swedishButton":
+                runnable = new TranslatorRunnable(wordOfDay,initialLanguage);
+                thread = new Thread(runnable);
+                thread.start();
+                returnPhraseUnicode = runnable.getTranslatedText();
+                break;
+            case "frenchButton":
+                runnable = new TranslatorRunnable(wordOfDay,initialLanguage);
+                thread = new Thread(runnable);
+                thread.start();
+                returnPhraseUnicode = runnable.getTranslatedText();
+                break;
+            case "germanButton":
+                runnable = new TranslatorRunnable(wordOfDay,initialLanguage);
+                thread = new Thread(runnable);
+                thread.start();
+                returnPhraseUnicode = runnable.getTranslatedText();
+                break;
+            case "indianButton":
+                runnable = new TranslatorRunnable(wordOfDay,initialLanguage);
+                thread = new Thread(runnable);
+                thread.start();
+                returnPhraseUnicode = runnable.getTranslatedText();
+                break;
+            case "japaneseButton":
+                runnable = new TranslatorRunnable(wordOfDay,initialLanguage);
+                thread = new Thread(runnable);
+                thread.start();
+                returnPhraseUnicode = runnable.getTranslatedText();
+                break;
+            case "portugeseButton":
+                runnable = new TranslatorRunnable(wordOfDay,initialLanguage);
+                thread = new Thread(runnable);
+                thread.start();
+                returnPhraseUnicode = runnable.getTranslatedText();
+                break;
+            case "polishButton":
+                runnable = new TranslatorRunnable(wordOfDay,initialLanguage);
+                thread = new Thread(runnable);
+                thread.start();
+                returnPhraseUnicode = runnable.getTranslatedText();
+                break;
+            case "italianButton":
+                runnable = new TranslatorRunnable(wordOfDay,initialLanguage);
+                thread = new Thread(runnable);
+                thread.start();
+                returnPhraseUnicode = runnable.getTranslatedText();
+                break;
+            case "chineseButton":
+                runnable = new TranslatorRunnable(wordOfDay,initialLanguage);
+                thread = new Thread(runnable);
+                thread.start();
+                returnPhraseUnicode = runnable.getTranslatedText();
+                break;
+            case "russianButton":
+                runnable = new TranslatorRunnable(wordOfDay,initialLanguage);
+                thread = new Thread(runnable);
+                thread.start();
+                returnPhraseUnicode = runnable.getTranslatedText();
+                break;
+            default:
+                throw new IllegalArgumentException("Error - Invalid language chosen: " + initialLanguage);
+        }
+
+        while (returnPhraseUnicode.equals("ERROR"))
+        {
+            returnPhraseUnicode = runnable.getTranslatedText();
+        }
+
+        Pattern p = Pattern.compile("\\\\u(\\p{XDigit}{4})");
+        Matcher m = p.matcher(returnPhraseUnicode);
+        StringBuffer returnPhraseASCII = new StringBuffer(returnPhraseUnicode.length());
+        while (m.find()) {
+            String ch = String.valueOf((char) Integer.parseInt(m.group(1), 16));
+            m.appendReplacement(returnPhraseASCII, Matcher.quoteReplacement(ch));
+        }
+        m.appendTail(returnPhraseASCII);
+
+        Log.d("Unicode conversion", "Converted " + returnPhraseUnicode + " to " + returnPhraseASCII.toString());
+
+        return returnPhraseASCII.toString();
+
+    }
+
     // Generates the target word - in the target language
     String GenEndWord()
     {
-        String returnPhrase = "";
+        TranslatorRunnable runnable = null;
+        Thread thread;
+
+        String returnPhraseUnicode = "";
         switch (targetLanguage) {
             case "englishButton":
-                returnPhrase = "The Banana";
+                returnPhraseUnicode = wordOfDay;
                 break;
             case "spanishButton":
-                returnPhrase = "El Platano";
+                runnable = new TranslatorRunnable(wordOfDay,targetLanguage);
+                thread = new Thread(runnable);
+                thread.start();
+                returnPhraseUnicode = runnable.getTranslatedText();
                 break;
             case "swedishButton":
-                returnPhrase = "Bananen";
+                runnable = new TranslatorRunnable(wordOfDay,targetLanguage);
+                thread = new Thread(runnable);
+                thread.start();
+                returnPhraseUnicode = runnable.getTranslatedText();
                 break;
             case "frenchButton":
-                returnPhrase = "La banane";
+                runnable = new TranslatorRunnable(wordOfDay,targetLanguage);
+                thread = new Thread(runnable);
+                thread.start();
+                returnPhraseUnicode = runnable.getTranslatedText();
                 break;
             case "germanButton":
-                returnPhrase = "Die Banane";
+                runnable = new TranslatorRunnable(wordOfDay,targetLanguage);
+                thread = new Thread(runnable);
+                thread.start();
+                returnPhraseUnicode = runnable.getTranslatedText();
                 break;
             case "indianButton":
-                returnPhrase = "केला";
-                break;
-            case "russianButton":
-                returnPhrase = "Банан";
-                break;
-            case "chineseButton":
-                returnPhrase = "香蕉";
+                runnable = new TranslatorRunnable(wordOfDay,targetLanguage);
+                thread = new Thread(runnable);
+                thread.start();
+                returnPhraseUnicode = runnable.getTranslatedText();
                 break;
             case "japaneseButton":
-                returnPhrase = "バナナ";
+                runnable = new TranslatorRunnable(wordOfDay,targetLanguage);
+                thread = new Thread(runnable);
+                thread.start();
+                returnPhraseUnicode = runnable.getTranslatedText();
                 break;
             case "portugeseButton":
-                returnPhrase = "A banana";
+                runnable = new TranslatorRunnable(wordOfDay,targetLanguage);
+                thread = new Thread(runnable);
+                thread.start();
+                returnPhraseUnicode = runnable.getTranslatedText();
                 break;
             case "polishButton":
-                returnPhrase = "banan";
+                runnable = new TranslatorRunnable(wordOfDay,targetLanguage);
+                thread = new Thread(runnable);
+                thread.start();
+                returnPhraseUnicode = runnable.getTranslatedText();
                 break;
             case "italianButton":
-                returnPhrase = "La banana";
+                runnable = new TranslatorRunnable(wordOfDay,targetLanguage);
+                thread = new Thread(runnable);
+                thread.start();
+                returnPhraseUnicode = runnable.getTranslatedText();
+                break;
+            case "chineseButton":
+                runnable = new TranslatorRunnable(wordOfDay,targetLanguage);
+                thread = new Thread(runnable);
+                thread.start();
+                returnPhraseUnicode = runnable.getTranslatedText();
+                break;
+            case "russianButton":
+                runnable = new TranslatorRunnable(wordOfDay,targetLanguage);
+                thread = new Thread(runnable);
+                thread.start();
+                returnPhraseUnicode = runnable.getTranslatedText();
                 break;
             default:
                 throw new IllegalArgumentException("Error - Invalid language chosen: " + targetLanguage);
         }
-        return returnPhrase;
+
+        while (returnPhraseUnicode.equals("ERROR"))
+        {
+            returnPhraseUnicode = runnable.getTranslatedText();
+        }
+
+        Pattern p = Pattern.compile("\\\\u(\\p{XDigit}{4})");
+        Matcher m = p.matcher(returnPhraseUnicode);
+        StringBuffer returnPhraseASCII = new StringBuffer(returnPhraseUnicode.length());
+        while (m.find()) {
+            String ch = String.valueOf((char) Integer.parseInt(m.group(1), 16));
+            m.appendReplacement(returnPhraseASCII, Matcher.quoteReplacement(ch));
+        }
+        m.appendTail(returnPhraseASCII);
+
+        Log.d("Unicode conversion", "Converted " + returnPhraseUnicode + " to " + returnPhraseASCII.toString());
+        return returnPhraseASCII.toString();
     }
 }
+
+
