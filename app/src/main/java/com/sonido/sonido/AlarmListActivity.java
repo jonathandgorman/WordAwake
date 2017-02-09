@@ -25,20 +25,19 @@ import java.util.ArrayList;
 * Author: Jonathan Gorman
 * Date: 13/10/2016
 *
-* Description: This is the main activity and is used to display a list of all registered alarms for the device.
+* Description: This is the main activity of the application and is used to display a list of all registered alarms for the device.
 *              From here, the user can add, edit and delete alarms.
 *
 * ---------------------------------------------------------------------------------------------------------------*/
 
 public class AlarmListActivity extends AppCompatActivity
 {
-    public static ArrayList<AlarmListItem> alarmItems;
-    public static ListView alarmListView;
-    public static ListViewCustomAdapter alarmListAdapter;
-    public String ALARM_LIST_STORAGE = "Alarm List Storage";
+    private static ArrayList<AlarmListItem> alarmItems;
+    private static ListView alarmListView;
+    private static ListViewCustomAdapter alarmListAdapter;
+    private String ALARM_LIST_STORAGE = "Alarm List Storage";
     private static final String ACTIVITY_TAG = "AlarmListActivity"; // Used for logging purposes
-    public static AlarmManager alarmManager;
-    public Intent intentFromSetAlarm;
+    private static AlarmManager alarmManager;
 
     // Default activity onCreate method called when activity is created
     @Override
@@ -48,26 +47,18 @@ public class AlarmListActivity extends AppCompatActivity
         Log.d(ACTIVITY_TAG, "onCreate called in AlarmListActivity");
         setContentView(R.layout.app_bar_alarm_list);
 
-        /*
-        *   1)  Create the alarm list to hold AlarmListItems Objects
-        */
+        // 1)  Create the alarm list to hold AlarmListItems Objects
         alarmListView = (ListView) findViewById(R.id.listView);
-        alarmItems = new ArrayList<AlarmListItem>();
+        alarmItems = new  ArrayList<AlarmListItem>();
 
-        /*
-        *   2)  Create an alarmManager using the system service that is provided with the context of the main activity class
-        */
+        // 2)  Create an alarmManager using the system service that is provided with the context of the main activity class
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE); // take the ALARM_SERVICE
 
-        /*
-        *   4) Set up the CustomAdapter to display the alarmItems
-        */
+        // 3) Set up the CustomAdapter to display the alarmItems
         alarmListAdapter = new ListViewCustomAdapter(this, alarmItems);
         alarmListView.setAdapter(alarmListAdapter);
 
-        /*
-        *   5) Set up parts of the view - floating button and toolbar
-        */
+        // 5) Set up parts of the view - floating button and toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -95,13 +86,15 @@ public class AlarmListActivity extends AppCompatActivity
         super.onNewIntent(intent);
         setIntent(intent); // this discards the original Intent
 
+        // If an intent is received from another activity
         if ((intent.getExtras() != null) && (intent.getStringExtra("TIME") != null))
         {
+
+
             Log.d(ACTIVITY_TAG, "Intent received, creating new alarm");
             Bundle extras = intent.getExtras();
-
             // Create a new alarm item and add the alarm data
-            AlarmListItem alarmItem = new AlarmListItem(this.getApplicationContext(), this.alarmManager);
+            AlarmListItem alarmItem = new AlarmListItem(this, this.alarmManager);
 
             // Take primary information
             alarmItem.alarmName = extras.getString("NAME");
@@ -226,15 +219,5 @@ public class AlarmListActivity extends AppCompatActivity
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    /*
-        The back button has been suppressed from the main activity - this ensures that any intents are not re-received from the setAlarm activity.
-        Also, the update to the alarmList ensures that an older alarmList cannot be mistakenly viewed
-    */
-    @Override
-    public void onBackPressed()
-    {
-        super.onBackPressed();
     }
 }

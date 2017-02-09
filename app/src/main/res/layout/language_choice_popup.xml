@@ -107,12 +107,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/indianButton"
-                android:src="@drawable/indianicon"
+
                 android:background="#00ffffff"
                 android:layout_gravity="center_horizontal"
                 android:clickable="true"
                 android:onClick="languageChange" />
-
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

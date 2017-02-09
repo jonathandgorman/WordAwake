@@ -1,18 +1,9 @@
 package com.sonido.sonido;
 
-/*----------------------------------------------------------------------------------------------------------------
-* Author: Jonathan Gorman
-* Date: 13/10/2016
-*
-* Description: The alarmListItem class is the "alarm" used in WordAwake, and stores all of the neccesary info
-* about the alarms created by the users.
-* ---------------------------------------------------------------------------------------------------------------*/
-
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -20,8 +11,17 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+/*----------------------------------------------------------------------------------------------------------------
+* Author: Jonathan Gorman
+* Date: 13/10/2016
+*
+* Description: The AlarmListItem class is the "alarm" used in WordAwake, and stores all of the necessary info
+* about the alarms created by the users.
+* ---------------------------------------------------------------------------------------------------------------*/
+
+
 // The details of the alarm list items which populate the list
-public class AlarmListItem extends AppCompatActivity implements Serializable
+public class AlarmListItem implements Serializable
 {
     // Primary alarm information
     public String alarmTime;
@@ -103,14 +103,6 @@ public class AlarmListItem extends AppCompatActivity implements Serializable
         long numberOfMinutes = (((timeDifference/1000)%86400)%3600)/60;
 
         String wordOfday = new WordOfDayGenerator().genWord();
-
-        // Assign audio file strings to send in intent
-        AudioGenerator audioGen = new AudioGenerator(initialLanguage, targetLanguage, wordOfday);
-        startPhrase = audioGen.GenStartPhrase();
-        endPhrase = audioGen.GenEndPhrase();
-        initialWordOfDay = audioGen.GenInitialWord();
-        targetWordOfDay = audioGen.GenEndWord();
-
 
         if (!initialWordOfDay.equals("ERROR") && !targetWordOfDay.equals("ERROR"))
         {

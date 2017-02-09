@@ -8,10 +8,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
-/**
- * Created by jonat_000 on 06/01/2017.
- */
-
 public class TranslatorRunnable implements Runnable
 {
     public String wordOfDay;
