@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Sonido.iml" filepath="$PROJECT_DIR$/Sonido.iml" />
       <module fileurl="file://$PROJECT_DIR$/WordAwake.iml" filepath="$PROJECT_DIR$/WordAwake.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>

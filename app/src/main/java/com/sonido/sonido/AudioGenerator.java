@@ -2,23 +2,31 @@ package com.sonido.sonido;
 
 import android.util.Log;
 
-import java.io.UnsupportedEncodingException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class AudioGenerator {
+public class AudioGenerator extends Thread{
 
     public String initialLanguage;
     public String targetLanguage;
+    public String startPhrase;
+    public String endPhrase;
     public String wordOfDay;
+    public String initialWord;
+    public String finalWord;
 
-    AudioGenerator(String initialLanguage, String targetLanguage, String wordOfDay) {
+    AudioGenerator(String initialLanguage, String targetLanguage) {
         this.initialLanguage = initialLanguage;
         this.targetLanguage = targetLanguage;
-        this.wordOfDay = wordOfDay;
+        this.wordOfDay = new WordOfDayGenerator().genWord();
+
+        startPhrase = this.GenStartPhrase();
+        endPhrase = this.GenEndPhrase();
+        initialWord = this.GenInitialWord();
+        finalWord = this.GenEndWord();
     }
 
-    // Generates the start phrase - E.G. Good Morning. The word of the day in _______ is:
+  // Generates the start phrase - E.G. Good Morning. The word of the day in _______ is:
     String GenStartPhrase() {
         String returnPhrase = "";
         switch (initialLanguage) {

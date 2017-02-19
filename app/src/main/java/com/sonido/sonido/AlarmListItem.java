@@ -19,7 +19,6 @@ import java.util.Calendar;
 * about the alarms created by the users.
 * ---------------------------------------------------------------------------------------------------------------*/
 
-
 // The details of the alarm list items which populate the list
 public class AlarmListItem implements Serializable
 {
@@ -47,10 +46,10 @@ public class AlarmListItem implements Serializable
     public boolean fadeInFlag;
 
     // Audio strings
-    private String startPhrase;
-    private String endPhrase;
-    private String initialWordOfDay = null;
-    private String targetWordOfDay = null;
+    public String startPhrase;
+    public String endPhrase;
+    public String initialWordOfDay = "";
+    public String targetWordOfDay = "";
 
     // Non serializable members
     transient public PendingIntent pendingAlarmIntent; // pending intent used to sound alarm
@@ -101,8 +100,6 @@ public class AlarmListItem implements Serializable
         long numberOfDays = (timeDifference/1000)/86400;
         long numberOfHours = ((timeDifference/1000)%86400)/3600;
         long numberOfMinutes = (((timeDifference/1000)%86400)%3600)/60;
-
-        String wordOfday = new WordOfDayGenerator().genWord();
 
         if (!initialWordOfDay.equals("ERROR") && !targetWordOfDay.equals("ERROR"))
         {

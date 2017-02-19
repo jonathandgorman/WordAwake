@@ -1,11 +1,15 @@
 package com.sonido.sonido;
 
+import android.app.AlarmManager;
 import android.app.DialogFragment;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
@@ -15,6 +19,8 @@ import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import java.util.Calendar;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
@@ -35,6 +41,9 @@ public class SetAlarmActivity extends AppCompatActivity {
     public String initialOrTargetChange; // determines if the user is changing the target or the initial language
     public String initialLanguageName;
     public String targetLanguageName;
+    private static AlarmManager alarmManager;
+    ProgressDialog progress;
+    AlarmListItem alarmItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -43,9 +52,13 @@ public class SetAlarmActivity extends AppCompatActivity {
         initialOrTargetChange = "initial"; // set to initial
         initialLanguageName = "englishButton"; // default initial language icon
         targetLanguageName = "spanishButton"; // default initial language icon
+        progress = new ProgressDialog(this);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_alarm);
+
+        // 2)  Create an alarmManager using the system service that is provided with the context of the main activity class
+        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE); // take the ALARM_SERVICE
 
         // Give the default time as the current system time
         final Calendar deviceCalendar = Calendar.getInstance();
@@ -83,51 +96,48 @@ public class SetAlarmActivity extends AppCompatActivity {
     // Create the alarm intent according to the users choices - the last part called after the user presses okay
     public void createAlarm()
     {
-        //Second, intent to change activity to alarm list screen
-        Intent setAlarmOk = new Intent(this, AlarmListActivity.class);
+        // Create a new alarm item and add the alarm data
+        alarmItem = new AlarmListItem(this, this.alarmManager);
 
-        //Add primary alarm data
-        EditText alarmName = (EditText) findViewById(R.id.alarmNameText);
-        setAlarmOk.putExtra("NAME", alarmName.getText().toString());
-        System.out.println("alarm name sent: " + alarmName.getText());
-        EditText alarmTime = (EditText) findViewById(R.id.alarmTimeText);
-        setAlarmOk.putExtra("TIME", alarmTime.getText().toString());
+        // Take primary information from the user
+        EditText chosenAlarmName = (EditText) findViewById(R.id.alarmNameText);
+        alarmItem.alarmName = chosenAlarmName.getText().toString();
+        EditText chosenAlarmTime = (EditText) findViewById(R.id.alarmTimeText);
+        alarmItem.alarmTime = chosenAlarmTime.getText().toString();
+        alarmItem.initialLanguage = initialLanguageName;
+        alarmItem.targetLanguage = targetLanguageName;
 
-        // Add chosen languages
-        setAlarmOk.putExtra("INITIAL", initialLanguageName);
-        setAlarmOk.putExtra("TARGET", targetLanguageName);
-
-        // Add active days data
+        // Take alarm active days
         CheckBox monday = (CheckBox) findViewById(R.id.mondayCheck);
-        setAlarmOk.putExtra("MONDAY", monday.isChecked());
         CheckBox tuesday = (CheckBox) findViewById(R.id.tuesdayCheck);
-        setAlarmOk.putExtra("TUESDAY", tuesday.isChecked());
         CheckBox wednesday = (CheckBox) findViewById(R.id.wednesdayCheck);
-        setAlarmOk.putExtra("WEDNESDAY", wednesday.isChecked());
         CheckBox thursday = (CheckBox) findViewById(R.id.thursdayCheck);
-        setAlarmOk.putExtra("THURSDAY", thursday.isChecked());
         CheckBox friday = (CheckBox) findViewById(R.id.fridayCheck);
-        setAlarmOk.putExtra("FRIDAY", friday.isChecked());
         CheckBox saturday = (CheckBox) findViewById(R.id.saturdayCheck);
-        setAlarmOk.putExtra("SATURDAY", saturday.isChecked());
         CheckBox sunday = (CheckBox) findViewById(R.id.sundayCheck);
-        setAlarmOk.putExtra("SUNDAY", sunday.isChecked());
+        alarmItem.mondayFlag = monday.isChecked();
+        alarmItem.tuesdayFlag = tuesday.isChecked();
+        alarmItem.wednesdayFlag = wednesday.isChecked();
+        alarmItem.thursdayFlag = thursday.isChecked();
+        alarmItem.fridayFlag = friday.isChecked();
+        alarmItem.saturdayFlag = saturday.isChecked();
+        alarmItem.sundayFlag = sunday.isChecked();
 
         // Add alarm options data
         Switch repeat = (Switch) findViewById(R.id.repeatSwitch);
-        setAlarmOk.putExtra("REPEAT", repeat.isChecked());
         Switch vibrate = (Switch) findViewById(R.id.vibrateSwitch);
-        setAlarmOk.putExtra("VIBRATE", vibrate.isChecked());
         Switch activate = (Switch) findViewById(R.id.activatedSwitch);
-        setAlarmOk.putExtra("ACTIVATE", activate.isChecked());
         Switch fade = (Switch) findViewById(R.id.fadeSwitch);
-        setAlarmOk.putExtra("FADE", fade.isChecked());
         SeekBar volume = (SeekBar) findViewById(R.id.volumeSeekBar);
-        setAlarmOk.putExtra("VOLUME", volume.getProgress());
-        setAlarmOk.putExtra("DURATION","5 Mins");
+        alarmItem.repeatFlag = repeat.isChecked();
+        alarmItem.vibrateFlag = vibrate.isChecked();
+        alarmItem.activatedFlag = activate.isChecked();
+        alarmItem.alarmVolume = volume.getProgress();
+        alarmItem.snoozeDuration = "5 Mins";
+        alarmItem.fadeInFlag = fade.isChecked();
 
-        setAlarmOk.setFlags(FLAG_ACTIVITY_CLEAR_TOP); // Note, this FLAG_ACTIVITY_CLEAR_TOP flag will ensure that the older AlarmListActivity will receive the intent and be updated. All other activitie above it, including this, will be destroyed
-        startActivity(setAlarmOk);
+        SubAudioGenerator sub = new SubAudioGenerator();
+        sub.execute();
     }
 
     // User has hit "CANCEL" to cancel their alarm - connected to "CANCEL" button
@@ -321,6 +331,347 @@ public class SetAlarmActivity extends AppCompatActivity {
             default:
                 alert.dismiss();
                 break;
+        }
+    }
+
+    // Subclass
+    class SubAudioGenerator extends AsyncTask<Void, String, Void>
+    {
+        public String initialLanguage;
+        public String targetLanguage;
+        public String startPhrase;
+        public String endPhrase;
+        public String wordOfDay;
+        public String initialWord;
+        public String finalWord;
+
+        @Override
+        protected void onPreExecute() {
+
+            progress.setTitle("Please Wait");
+            progress.setMessage("Downloading resources...");
+            progress.setCancelable(false);
+            progress.show();
+
+        }
+        @Override
+        protected Void doInBackground(Void... params){
+
+            wordOfDay = new WordOfDayGenerator().genWord();
+            alarmItem.startPhrase = GenStartPhrase();
+            alarmItem.endPhrase = GenEndPhrase();
+            alarmItem.initialWordOfDay = GenInitialWord();
+            alarmItem.targetWordOfDay = GenEndWord();
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+
+            progress.dismiss();
+
+            // If alarm is flagged to be activated, set the alarm
+            if (alarmItem.activatedFlag == true)
+            {
+                alarmItem.setAlarm();
+            }
+
+            // Finally, send an intent to the main activity with the new alarm object
+            Intent setAlarmOk = new Intent(SetAlarmActivity.this, AlarmListActivity.class);
+            setAlarmOk.putExtra("ALARM", alarmItem);
+            setAlarmOk.setFlags(FLAG_ACTIVITY_CLEAR_TOP); // Note, this FLAG_ACTIVITY_CLEAR_TOP flag will ensure that the older AlarmListActivity will receive the intent and be updated. All other activitie above it, including this, will be destroyed
+            startActivity(setAlarmOk);
+
+        }
+
+        // Generates the start phrase - E.G. Good Morning. The word of the day in _______ is:
+        String GenStartPhrase() {
+            String returnPhrase = "";
+            switch (alarmItem.initialLanguage) {
+                case "englishButton":
+                    returnPhrase = "Good morning. The word of the day is: ";
+                    break;
+                case "spanishButton":
+                    returnPhrase = "Buenos dias. La palabra del dia es: ";
+                    break;
+                case "swedishButton":
+                    returnPhrase = "God morgon. Ordet för dagen är: ";
+                    break;
+                case "frenchButton":
+                    returnPhrase = "Bonjour. Le mot du jour est:";
+                    break;
+                case "germanButton":
+                    returnPhrase = "Guten Morgen. Das Wort des Tages ist:";
+                    break;
+                case "indianButton":
+                    returnPhrase = "शुभ प्रभात। दिन का शब्द है:";
+                    break;
+                case "russianButton":
+                    returnPhrase = "Доброе утро. Слово дня:";
+                    break;
+                case "chineseButton":
+                    returnPhrase = "早上好。一天的话是：";
+                    break;
+                case "japaneseButton":
+                    returnPhrase = "おはようございます。今日の言葉は：";
+                    break;
+                case "portugeseButton":
+                    returnPhrase = "Bom Dia. A palavra do dia é:";
+                    break;
+                case "polishButton":
+                    returnPhrase = "Dzień dobry. Słowo dnia jest:";
+                    break;
+                case "italianButton":
+                    returnPhrase = "Buongiorno. La parola del giorno è il seguente:";
+                    break;
+                default:
+                    throw new IllegalArgumentException("Error - Invalid language chosen: " + alarmItem.initialLanguage);
+            }
+            return returnPhrase;
+        }
+        // Generates the end phrase - E.G. Which means ...
+        String GenEndPhrase() {
+            String returnPhrase = "";
+            switch (alarmItem.initialLanguage) {
+                case "englishButton":
+                    returnPhrase = "Which means: ";
+                    break;
+                case "spanishButton":
+                    returnPhrase = "Que significa: ";
+                    break;
+                case "swedishButton":
+                    returnPhrase = "Som betyder: ";
+                    break;
+                case "frenchButton":
+                    returnPhrase = "Ce qui signifie: ";
+                    break;
+                case "germanButton":
+                    returnPhrase = "Was bedeutet: ";
+                    break;
+                case "indianButton":
+                    returnPhrase = "जिसका मतलब है: ";
+                    break;
+                case "russianButton":
+                    returnPhrase = "Что значит: ";
+                    break;
+                case "chineseButton":
+                    returnPhrase = "意思是: ";
+                    break;
+                case "japaneseButton":
+                    returnPhrase = "つまり: ";
+                    break;
+                case "portugeseButton":
+                    returnPhrase = "Que significa: ";
+                    break;
+                case "polishButton":
+                    returnPhrase = "Co znaczy: ";
+                    break;
+                case "italianButton":
+                    returnPhrase = "Che significa: ";
+                    break;
+                default:
+                    throw new IllegalArgumentException("Error - Invalid language chosen: " + alarmItem.initialLanguage);
+            }
+            return returnPhrase;
+        }
+        // Generates the initial word - in the initial language
+        String GenInitialWord()
+        {
+            TranslatorRunnable runnable = null;
+            Thread thread;
+
+            String returnPhraseUnicode = "";
+            switch (alarmItem.initialLanguage) {
+                case "englishButton":
+                    returnPhraseUnicode = wordOfDay;
+                    break;
+                case "spanishButton":
+                    runnable = new TranslatorRunnable(wordOfDay,alarmItem.initialLanguage);
+                    thread = new Thread(runnable);
+                    thread.start();
+                    returnPhraseUnicode = runnable.getTranslatedText();
+                    break;
+                case "swedishButton":
+                    runnable = new TranslatorRunnable(wordOfDay,alarmItem.initialLanguage);
+                    thread = new Thread(runnable);
+                    thread.start();
+                    returnPhraseUnicode = runnable.getTranslatedText();
+                    break;
+                case "frenchButton":
+                    runnable = new TranslatorRunnable(wordOfDay,alarmItem.initialLanguage);
+                    thread = new Thread(runnable);
+                    thread.start();
+                    returnPhraseUnicode = runnable.getTranslatedText();
+                    break;
+                case "germanButton":
+                    runnable = new TranslatorRunnable(wordOfDay,alarmItem.initialLanguage);
+                    thread = new Thread(runnable);
+                    thread.start();
+                    returnPhraseUnicode = runnable.getTranslatedText();
+                    break;
+                case "indianButton":
+                    runnable = new TranslatorRunnable(wordOfDay,alarmItem.initialLanguage);
+                    thread = new Thread(runnable);
+                    thread.start();
+                    returnPhraseUnicode = runnable.getTranslatedText();
+                    break;
+                case "japaneseButton":
+                    runnable = new TranslatorRunnable(wordOfDay,alarmItem.initialLanguage);
+                    thread = new Thread(runnable);
+                    thread.start();
+                    returnPhraseUnicode = runnable.getTranslatedText();
+                    break;
+                case "portugeseButton":
+                    runnable = new TranslatorRunnable(wordOfDay,alarmItem.initialLanguage);
+                    thread = new Thread(runnable);
+                    thread.start();
+                    returnPhraseUnicode = runnable.getTranslatedText();
+                    break;
+                case "polishButton":
+                    runnable = new TranslatorRunnable(wordOfDay,alarmItem.initialLanguage);
+                    thread = new Thread(runnable);
+                    thread.start();
+                    returnPhraseUnicode = runnable.getTranslatedText();
+                    break;
+                case "italianButton":
+                    runnable = new TranslatorRunnable(wordOfDay,alarmItem.initialLanguage);
+                    thread = new Thread(runnable);
+                    thread.start();
+                    returnPhraseUnicode = runnable.getTranslatedText();
+                    break;
+                case "chineseButton":
+                    runnable = new TranslatorRunnable(wordOfDay,alarmItem.initialLanguage);
+                    thread = new Thread(runnable);
+                    thread.start();
+                    returnPhraseUnicode = runnable.getTranslatedText();
+                    break;
+                case "russianButton":
+                    runnable = new TranslatorRunnable(wordOfDay,alarmItem.initialLanguage);
+                    thread = new Thread(runnable);
+                    thread.start();
+                    returnPhraseUnicode = runnable.getTranslatedText();
+                    break;
+                default:
+                    throw new IllegalArgumentException("Error - Invalid language chosen: " + alarmItem.initialLanguage);
+            }
+
+            while (returnPhraseUnicode.equals("ERROR"))
+            {
+                returnPhraseUnicode = runnable.getTranslatedText();
+            }
+
+            Pattern p = Pattern.compile("\\\\u(\\p{XDigit}{4})");
+            Matcher m = p.matcher(returnPhraseUnicode);
+            StringBuffer returnPhraseASCII = new StringBuffer(returnPhraseUnicode.length());
+            while (m.find()) {
+                String ch = String.valueOf((char) Integer.parseInt(m.group(1), 16));
+                m.appendReplacement(returnPhraseASCII, Matcher.quoteReplacement(ch));
+            }
+            m.appendTail(returnPhraseASCII);
+
+            Log.d("Unicode conversion", "Converted " + returnPhraseUnicode + " to " + returnPhraseASCII.toString());
+
+            return returnPhraseASCII.toString();
+
+        }
+        // Generates the target word - in the target language
+        String GenEndWord()
+        {
+            TranslatorRunnable runnable = null;
+            Thread thread;
+
+            String returnPhraseUnicode = "";
+            switch (alarmItem.targetLanguage) {
+                case "englishButton":
+                    returnPhraseUnicode = wordOfDay;
+                    break;
+                case "spanishButton":
+                    runnable = new TranslatorRunnable(wordOfDay,alarmItem.targetLanguage);
+                    thread = new Thread(runnable);
+                    thread.start();
+                    returnPhraseUnicode = runnable.getTranslatedText();
+                    break;
+                case "swedishButton":
+                    runnable = new TranslatorRunnable(wordOfDay,alarmItem.targetLanguage);
+                    thread = new Thread(runnable);
+                    thread.start();
+                    returnPhraseUnicode = runnable.getTranslatedText();
+                    break;
+                case "frenchButton":
+                    runnable = new TranslatorRunnable(wordOfDay,alarmItem.targetLanguage);
+                    thread = new Thread(runnable);
+                    thread.start();
+                    returnPhraseUnicode = runnable.getTranslatedText();
+                    break;
+                case "germanButton":
+                    runnable = new TranslatorRunnable(wordOfDay,alarmItem.targetLanguage);
+                    thread = new Thread(runnable);
+                    thread.start();
+                    returnPhraseUnicode = runnable.getTranslatedText();
+                    break;
+                case "indianButton":
+                    runnable = new TranslatorRunnable(wordOfDay,alarmItem.targetLanguage);
+                    thread = new Thread(runnable);
+                    thread.start();
+                    returnPhraseUnicode = runnable.getTranslatedText();
+                    break;
+                case "japaneseButton":
+                    runnable = new TranslatorRunnable(wordOfDay,alarmItem.targetLanguage);
+                    thread = new Thread(runnable);
+                    thread.start();
+                    returnPhraseUnicode = runnable.getTranslatedText();
+                    break;
+                case "portugeseButton":
+                    runnable = new TranslatorRunnable(wordOfDay,alarmItem.targetLanguage);
+                    thread = new Thread(runnable);
+                    thread.start();
+                    returnPhraseUnicode = runnable.getTranslatedText();
+                    break;
+                case "polishButton":
+                    runnable = new TranslatorRunnable(wordOfDay,alarmItem.targetLanguage);
+                    thread = new Thread(runnable);
+                    thread.start();
+                    returnPhraseUnicode = runnable.getTranslatedText();
+                    break;
+                case "italianButton":
+                    runnable = new TranslatorRunnable(wordOfDay,alarmItem.targetLanguage);
+                    thread = new Thread(runnable);
+                    thread.start();
+                    returnPhraseUnicode = runnable.getTranslatedText();
+                    break;
+                case "chineseButton":
+                    runnable = new TranslatorRunnable(wordOfDay,alarmItem.targetLanguage);
+                    thread = new Thread(runnable);
+                    thread.start();
+                    returnPhraseUnicode = runnable.getTranslatedText();
+                    break;
+                case "russianButton":
+                    runnable = new TranslatorRunnable(wordOfDay,alarmItem.targetLanguage);
+                    thread = new Thread(runnable);
+                    thread.start();
+                    returnPhraseUnicode = runnable.getTranslatedText();
+                    break;
+                default:
+                    throw new IllegalArgumentException("Error - Invalid language chosen: " + alarmItem.targetLanguage);
+            }
+
+            while (returnPhraseUnicode.equals("ERROR"))
+            {
+                returnPhraseUnicode = runnable.getTranslatedText();
+            }
+
+            Pattern p = Pattern.compile("\\\\u(\\p{XDigit}{4})");
+            Matcher m = p.matcher(returnPhraseUnicode);
+            StringBuffer returnPhraseASCII = new StringBuffer(returnPhraseUnicode.length());
+            while (m.find()) {
+                String ch = String.valueOf((char) Integer.parseInt(m.group(1), 16));
+                m.appendReplacement(returnPhraseASCII, Matcher.quoteReplacement(ch));
+            }
+            m.appendTail(returnPhraseASCII);
+
+            Log.d("Unicode conversion", "Converted " + returnPhraseUnicode + " to " + returnPhraseASCII.toString());
+            return returnPhraseASCII.toString();
         }
     }
 }

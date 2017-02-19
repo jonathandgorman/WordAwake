@@ -25,8 +25,8 @@ import java.util.ArrayList;
 * Author: Jonathan Gorman
 * Date: 13/10/2016
 *
-* Description: This is the main activity of the application and is used to display a list of all registered alarms for the device.
-*              From here, the user can add, edit and delete alarms.
+* Description: The main activity of the application. This activity houses the primary alarm list used to display
+*              all registered alarms. From here, the user may add, delete, or edit alarms.
 *
 * ---------------------------------------------------------------------------------------------------------------*/
 
@@ -37,7 +37,6 @@ public class AlarmListActivity extends AppCompatActivity
     private static ListViewCustomAdapter alarmListAdapter;
     private String ALARM_LIST_STORAGE = "Alarm List Storage";
     private static final String ACTIVITY_TAG = "AlarmListActivity"; // Used for logging purposes
-    private static AlarmManager alarmManager;
 
     // Default activity onCreate method called when activity is created
     @Override
@@ -50,9 +49,6 @@ public class AlarmListActivity extends AppCompatActivity
         // 1)  Create the alarm list to hold AlarmListItems Objects
         alarmListView = (ListView) findViewById(R.id.listView);
         alarmItems = new  ArrayList<AlarmListItem>();
-
-        // 2)  Create an alarmManager using the system service that is provided with the context of the main activity class
-        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE); // take the ALARM_SERVICE
 
         // 3) Set up the CustomAdapter to display the alarmItems
         alarmListAdapter = new ListViewCustomAdapter(this, alarmItems);
@@ -84,50 +80,11 @@ public class AlarmListActivity extends AppCompatActivity
     {
         Log.d(ACTIVITY_TAG, "Entered onNewIntent");
         super.onNewIntent(intent);
-        setIntent(intent); // this discards the original Intent
 
-        // If an intent is received from another activity
-        if ((intent.getExtras() != null) && (intent.getStringExtra("TIME") != null))
-        {
-
-
-            Log.d(ACTIVITY_TAG, "Intent received, creating new alarm");
-            Bundle extras = intent.getExtras();
-            // Create a new alarm item and add the alarm data
-            AlarmListItem alarmItem = new AlarmListItem(this, this.alarmManager);
-
-            // Take primary information
-            alarmItem.alarmName = extras.getString("NAME");
-            alarmItem.alarmTime = extras.getString("TIME");
-            alarmItem.initialLanguage = extras.getString("INITIAL");
-            alarmItem.targetLanguage = extras.getString("TARGET");
-            // Take days
-            alarmItem.mondayFlag = extras.getBoolean("MONDAY");
-            alarmItem.tuesdayFlag = extras.getBoolean("TUESDAY");
-            alarmItem.wednesdayFlag = extras.getBoolean("WEDNESDAY");
-            alarmItem.thursdayFlag = extras.getBoolean("THURSDAY");
-            alarmItem.fridayFlag = extras.getBoolean("FRIDAY");
-            alarmItem.saturdayFlag = extras.getBoolean("SATURDAY");
-            alarmItem.sundayFlag = extras.getBoolean("SUNDAY");
-            // Take options
-            alarmItem.repeatFlag = extras.getBoolean("REPEAT");
-            alarmItem.vibrateFlag = extras.getBoolean("VIBRATE");
-            alarmItem.activatedFlag = extras.getBoolean("ACTIVATE");
-            alarmItem.alarmVolume = extras.getInt("VOLUME");
-            alarmItem.snoozeDuration = extras.getString("DURATION");
-            alarmItem.fadeInFlag = extras.getBoolean("FADE");
-
-            // Add to the alarm list, notify the adapter, and save the final list
-            alarmItems.add(0, alarmItem); // Note,new element added to position "0"
-            saveAlarmList();
-
-            // If alarm is flagged to be activated, set the alarm
-            if (alarmItem.activatedFlag == true)
-            {
-                alarmItem.setAlarm();
-            }
-        }
-        alarmListAdapter.updateAlarmList(alarmItems);
+        // Take the new alarm intent from the SetAlarmActivity
+        AlarmListItem alarmItem = (AlarmListItem) intent.getSerializableExtra("ALARM");
+        alarmItems.add(0, alarmItem); // Note, new element added to top position "0"
+        saveAlarmList();
     }
 
     // Called when application is resumed
@@ -221,3 +178,50 @@ public class AlarmListActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 }
+
+
+  /*
+        setIntent(intent); // this discards the original Intent
+
+        // If an intent is received from another activity
+        if ((intent.getExtras() != null) && (intent.getStringExtra("TIME") != null))
+        {
+            Log.d(ACTIVITY_TAG, "Intent received, creating new alarm");
+            Bundle extras = intent.getExtras();
+            // Create a new alarm item and add the alarm data
+            AlarmListItem alarmItem = new AlarmListItem(this, this.alarmManager);
+
+            // Take primary information
+            alarmItem.alarmName = extras.getString("NAME");
+            alarmItem.alarmTime = extras.getString("TIME");
+            alarmItem.initialLanguage = extras.getString("INITIAL");
+            alarmItem.targetLanguage = extras.getString("TARGET");
+            // Take days
+            alarmItem.mondayFlag = extras.getBoolean("MONDAY");
+            alarmItem.tuesdayFlag = extras.getBoolean("TUESDAY");
+            alarmItem.wednesdayFlag = extras.getBoolean("WEDNESDAY");
+            alarmItem.thursdayFlag = extras.getBoolean("THURSDAY");
+            alarmItem.fridayFlag = extras.getBoolean("FRIDAY");
+            alarmItem.saturdayFlag = extras.getBoolean("SATURDAY");
+            alarmItem.sundayFlag = extras.getBoolean("SUNDAY");
+            // Take options
+            alarmItem.repeatFlag = extras.getBoolean("REPEAT");
+            alarmItem.vibrateFlag = extras.getBoolean("VIBRATE");
+            alarmItem.activatedFlag = extras.getBoolean("ACTIVATE");
+            alarmItem.alarmVolume = extras.getInt("VOLUME");
+            alarmItem.snoozeDuration = extras.getString("DURATION");
+            alarmItem.fadeInFlag = extras.getBoolean("FADE");
+
+            // Add to the alarm list, notify the adapter, and save the final list
+            alarmItems.add(0, alarmItem); // Note,new element added to position "0"
+            saveAlarmList();
+
+            // If alarm is flagged to be activated, set the alarm
+            if (alarmItem.activatedFlag == true)
+            {
+                alarmItem.setAlarm();
+            }
+        }
+        alarmListAdapter.updateAlarmList(alarmItems);
+
+        */

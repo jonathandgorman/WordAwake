@@ -9,143 +9,204 @@
     android:scrollIndicators="none"
     android:weightSum="1">
 
-    <HorizontalScrollView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/horizontalScrollView">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/verticalScrollView">
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#ffffff">
+            android:orientation="vertical" >
 
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/englishButton"
-                android:src="@drawable/englishicon"
-                android:background="#00ffffff"
-                android:layout_gravity="center_horizontal"
-                android:clickable="true"
-                android:baselineAlignBottom="false"
-                android:contextClickable="true"
-                android:onClick="languageChange" />
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/spanishButton"
-                android:src="@drawable/spanishicon"
-                android:clickable="true"
-                android:background="#00ffffff"
-                android:layout_gravity="center_horizontal"
-                android:contextClickable="true"
-                android:onClick="languageChange" />
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/frenchButton"
-                android:src="@drawable/frenchicon"
-                android:background="#00ffffff"
-                android:layout_gravity="center_horizontal"
-                android:clickable="true"
-                android:onClick="languageChange" />
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/englishButton"
+                        android:src="@drawable/englishicon"
+                        android:background="#00ffffff"
+                        android:layout_gravity="center_horizontal"
+                        android:clickable="true"
+                        android:baselineAlignBottom="false"
+                        android:contextClickable="true"
+                        android:onClick="languageChange"
+                        android:layout_weight="1" />
 
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/germanButton"
-                android:src="@drawable/germanicon"
-                android:background="#00ffffff"
-                android:layout_gravity="center_horizontal"
-                android:clickable="true"
-                android:onClick="languageChange" />
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/spanishButton"
+                        android:src="@drawable/spanishicon"
+                        android:clickable="true"
+                        android:background="#00ffffff"
+                        android:layout_gravity="center_horizontal"
+                        android:contextClickable="true"
+                        android:onClick="languageChange"
+                        android:layout_weight="1" />
 
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/italianButton"
-                android:src="@drawable/italianicon"
-                android:background="#00ffffff"
-                android:layout_gravity="center_horizontal"
-                android:clickable="true"
-                android:onClick="languageChange" />
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/frenchButton"
+                        android:src="@drawable/frenchicon"
+                        android:background="#00ffffff"
+                        android:layout_gravity="center_horizontal"
+                        android:clickable="true"
+                        android:onClick="languageChange"
+                        android:layout_weight="1" />
 
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/portugeseButton"
-                android:src="@drawable/portugeseicon"
-                android:background="#00ffffff"
-                android:layout_gravity="center_horizontal"
-                android:clickable="true"
-                android:onClick="languageChange" />
+                </LinearLayout>
+            </LinearLayout>
 
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/swedishButton"
-                android:src="@drawable/swedishicon"
-                android:background="#00ffffff"
-                android:layout_gravity="center_horizontal"
-                android:clickable="true"
-                android:onClick="languageChange" />
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/polishButton"
-                android:src="@drawable/polishicon"
-                android:background="#00ffffff"
-                android:layout_gravity="center_horizontal"
-                android:clickable="true"
-                android:onClick="languageChange" />
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/indianButton"
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/germanButton"
+                        android:src="@drawable/germanicon"
+                        android:background="#00ffffff"
+                        android:layout_gravity="center_horizontal"
+                        android:clickable="true"
+                        android:onClick="languageChange"
+                        android:layout_weight="1" />
 
-                android:background="#00ffffff"
-                android:layout_gravity="center_horizontal"
-                android:clickable="true"
-                android:onClick="languageChange" />
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/japaneseButton"
-                android:src="@drawable/japaneseicon"
-                android:clickable="true"
-                android:background="#00ffffff"
-                android:layout_gravity="center_horizontal"
-                android:contextClickable="true"
-                android:onClick="languageChange"
-                android:layout_weight="1"
-                tools:src="@drawable/japaneseicon" />
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/portugeseButton"
+                        android:src="@drawable/portugeseicon"
+                        android:background="#00ffffff"
+                        android:layout_gravity="center_horizontal"
+                        android:clickable="true"
+                        android:onClick="languageChange"
+                        android:layout_weight="1" />
 
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/chineseButton"
-                android:src="@drawable/chineseicon"
-                android:background="#00ffffff"
-                android:layout_gravity="center_horizontal"
-                android:clickable="true"
-                android:onClick="languageChange" />
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/italianButton"
+                        android:src="@drawable/italianicon"
+                        android:background="#00ffffff"
+                        android:layout_gravity="center_horizontal"
+                        android:clickable="true"
+                        android:onClick="languageChange"
+                        android:layout_weight="1" />
 
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/russianButton"
-                android:src="@drawable/russianicon"
-                android:background="#00ffffff"
-                android:layout_gravity="center_horizontal"
-                android:clickable="true"
-                android:onClick="languageChange" />
+                </LinearLayout>
+            </LinearLayout>
 
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageButton
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/polishButton"
+                        android:src="@drawable/polishicon"
+                        android:background="#00ffffff"
+                        android:layout_gravity="center_horizontal"
+                        android:clickable="true"
+                        android:onClick="languageChange"
+                        android:layout_weight="1" />
+
+                    <ImageButton
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/swedishButton"
+                        android:src="@drawable/swedishicon"
+                        android:background="#00ffffff"
+                        android:layout_gravity="center_horizontal"
+                        android:clickable="true"
+                        android:onClick="languageChange"
+                        android:layout_weight="1" />
+
+                    <ImageButton
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/indianButton"
+                        android:src="@drawable/indianicon"
+                        android:background="#00ffffff"
+                        android:layout_gravity="center_horizontal"
+                        android:clickable="true"
+                        android:onClick="languageChange"
+                        android:layout_weight="1" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageButton
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/japaneseButton"
+                        android:src="@drawable/japaneseicon"
+                        android:clickable="true"
+                        android:background="#00ffffff"
+                        android:layout_gravity="center_horizontal"
+                        android:contextClickable="true"
+                        android:onClick="languageChange"
+                        android:layout_weight="1"
+                        tools:src="@drawable/japaneseicon" />
+
+                    <ImageButton
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/chineseButton"
+                        android:src="@drawable/chineseicon"
+                        android:background="#00ffffff"
+                        android:layout_gravity="center_horizontal"
+                        android:clickable="true"
+                        android:onClick="languageChange"
+                        android:layout_weight="1" />
+
+                    <ImageButton
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/russianButton"
+                        android:src="@drawable/russianicon"
+                        android:background="#00ffffff"
+                        android:layout_gravity="center_horizontal"
+                        android:clickable="true"
+                        android:onClick="languageChange"
+                        android:layout_weight="1" />
+
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
-    </HorizontalScrollView>
+    </ScrollView>
 
 </LinearLayout>
