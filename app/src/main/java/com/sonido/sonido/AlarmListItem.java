@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -22,6 +21,10 @@ import java.util.Calendar;
 // The details of the alarm list items which populate the list
 public class AlarmListItem implements Serializable
 {
+    // General alarm variables
+    public int position; // the position in the alarm list that the alarm object should be placed
+    public boolean editedFlag;
+
     // Primary alarm information
     public String alarmTime;
     public String alarmName;
@@ -62,6 +65,8 @@ public class AlarmListItem implements Serializable
     {
         this.alarmManager = alarmManager;
         this.context = context;
+        this.position = 0;
+        this.editedFlag = false;
     }
 
     // Alarm list item constructor

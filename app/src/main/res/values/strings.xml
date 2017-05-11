@@ -1,7 +1,7 @@
 <resources>
 
     <string name="title_activity_alarm_list">WordAwake</string>
-    <string name="app_name">Create Alarm</string>
+    <string name="app_name">WordAwake</string>
 
     <string name="action_about">About</string>
     <string name="action_faq">FAQ</string>

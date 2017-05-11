@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -41,8 +42,9 @@ public class SetAlarmActivity extends AppCompatActivity {
     public String initialLanguageName;
     public String targetLanguageName;
     private static AlarmManager alarmManager;
-    ProgressDialog progress;
+    ProgressDialog progressPopup;
     AlarmListItem alarmItem;
+    AudioGenerator subAudioGen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -51,31 +53,170 @@ public class SetAlarmActivity extends AppCompatActivity {
         initialOrTargetChange = "initial"; // set to initial
         initialLanguageName = "englishButton"; // default initial language icon
         targetLanguageName = "spanishButton"; // default initial language icon
-        progress = new ProgressDialog(this);
+        progressPopup = new ProgressDialog(this);
+        progressPopup.setButton(DialogInterface.BUTTON_NEGATIVE,"Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_alarm);
 
-        // 2)  Create an alarmManager using the system service that is provided with the context of the main activity class
+        // Create an alarmManager using the system service that is provided with the context of the main activity class
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE); // take the ALARM_SERVICE
 
-        // Give the default time as the current system time
-        final Calendar deviceCalendar = Calendar.getInstance();
-        String hour = String.valueOf(deviceCalendar.get(Calendar.HOUR_OF_DAY));
-        String minute = String.valueOf(deviceCalendar.get(Calendar.MINUTE));
-        TextView timeTextView = (TextView) findViewById(R.id.alarmTimeText);
+        // Check if the activity has been started to create a new alarm or via an alarm edit
+        Intent intent = getIntent();
+        if(intent.hasExtra("EDIT_ALARM")) //Check if the alarm is to be edited
+        {
+            this.alarmItem = (AlarmListItem) intent.getSerializableExtra("EDIT_ALARM");
 
-        // In the case that hour or minute is equal to "0" or is less than "10" and will not display correctly
-        if (hour.equals("0"))
-        {hour = "00";}
-        else if (Integer.valueOf(hour) < 10)
-        {hour = "0" + hour;}
-        if (minute.equals("0"))
-        {minute = "00";}
-        else if (Integer.valueOf(minute) < 10)
-        {minute = "0" + minute;}
+            // Take primary information from the user
+            EditText chosenAlarmName = (EditText) findViewById(R.id.alarmNameText);
+            chosenAlarmName.setText(this.alarmItem.alarmName);
 
-        timeTextView.setText(hour + ":" + minute);
+            EditText chosenAlarmTime = (EditText) findViewById(R.id.alarmTimeText);
+            chosenAlarmTime.setText(this.alarmItem.alarmTime);
+
+            this.initialLanguageName = alarmItem.initialLanguage;
+            this.targetLanguageName = alarmItem.targetLanguage;
+            ImageView initialImageButton = (ImageView) findViewById(R.id.initialLanguageImage);
+            ImageView targetImageButton = (ImageView) findViewById(R.id.targetLanguageImage);
+
+            switch (this.initialLanguageName)
+            {
+                case "englishButton":
+                    initialImageButton.setImageResource(R.drawable.englishicon);
+                    break;
+                case "spanishButton":
+                    initialImageButton.setImageResource(R.drawable.spanishicon);
+                    break;
+                case "frenchButton":
+                    initialImageButton.setImageResource(R.drawable.frenchicon);
+                    break;
+                case "germanButton":
+                    initialImageButton.setImageResource(R.drawable.germanicon);
+                    break;
+                case "indianButton":
+                    initialImageButton.setImageResource(R.drawable.indianicon);
+                    break;
+                case "russianButton":
+                    initialImageButton.setImageResource(R.drawable.russianicon);
+                    break;
+                case "chineseButton":
+                    initialImageButton.setImageResource(R.drawable.chineseicon);
+                    break;
+                case "japaneseButton":
+                    initialImageButton.setImageResource(R.drawable.japaneseicon);
+                    break;
+                case "swedishButton":
+                    initialImageButton.setImageResource(R.drawable.swedishicon);
+                    break;
+                case "portugeseButton":
+                    initialImageButton.setImageResource(R.drawable.portugeseicon);
+                    break;
+                case "polishButton":
+                    initialImageButton.setImageResource(R.drawable.polishicon);
+                    break;
+                case "italianButton":
+                    initialImageButton.setImageResource(R.drawable.italianicon);
+                    break;
+                default:
+                    break;
+            }
+
+            switch (this.targetLanguageName)
+            {
+                case "englishButton":
+                    targetImageButton.setImageResource(R.drawable.englishicon);
+                    break;
+                case "spanishButton":
+                    targetImageButton.setImageResource(R.drawable.spanishicon);
+                    break;
+                case "frenchButton":
+                    targetImageButton.setImageResource(R.drawable.frenchicon);
+                    break;
+                case "germanButton":
+                    targetImageButton.setImageResource(R.drawable.germanicon);
+                    break;
+                case "indianButton":
+                    targetImageButton.setImageResource(R.drawable.indianicon);
+                    break;
+                case "russianButton":
+                    targetImageButton.setImageResource(R.drawable.russianicon);
+                    break;
+                case "chineseButton":
+                    targetImageButton.setImageResource(R.drawable.chineseicon);
+                    break;
+                case "japaneseButton":
+                    targetImageButton.setImageResource(R.drawable.japaneseicon);
+                    break;
+                case "swedishButton":
+                    initialImageButton.setImageResource(R.drawable.swedishicon);
+                    break;
+                case "portugeseButton":
+                    initialImageButton.setImageResource(R.drawable.portugeseicon);
+                    break;
+                case "polishButton":
+                    initialImageButton.setImageResource(R.drawable.polishicon);
+                    break;
+                case "italianButton":
+                    initialImageButton.setImageResource(R.drawable.italianicon);
+                    break;
+                default:
+                    break;
+            }
+
+            // Set alarm active days
+            CheckBox monday = (CheckBox) findViewById(R.id.mondayCheck);
+            CheckBox tuesday = (CheckBox) findViewById(R.id.tuesdayCheck);
+            CheckBox wednesday = (CheckBox) findViewById(R.id.wednesdayCheck);
+            CheckBox thursday = (CheckBox) findViewById(R.id.thursdayCheck);
+            CheckBox friday = (CheckBox) findViewById(R.id.fridayCheck);
+            CheckBox saturday = (CheckBox) findViewById(R.id.saturdayCheck);
+            CheckBox sunday = (CheckBox) findViewById(R.id.sundayCheck);
+            monday.setChecked(alarmItem.mondayFlag);
+            tuesday.setChecked(alarmItem.tuesdayFlag);
+            wednesday.setChecked(alarmItem.wednesdayFlag);
+            thursday.setChecked(alarmItem.thursdayFlag);
+            friday.setChecked(alarmItem.fridayFlag);
+            saturday.setChecked(alarmItem.saturdayFlag);
+            sunday.setChecked(alarmItem.sundayFlag);;
+
+            // Add alarm options data
+            Switch repeat = (Switch) findViewById(R.id.repeatSwitch);
+            Switch vibrate = (Switch) findViewById(R.id.vibrateSwitch);
+            Switch activate = (Switch) findViewById(R.id.activatedSwitch);
+            Switch fade = (Switch) findViewById(R.id.fadeSwitch);
+            SeekBar volume = (SeekBar) findViewById(R.id.volumeSeekBar);
+            repeat.setChecked(alarmItem.repeatFlag );
+            vibrate.setChecked(alarmItem.vibrateFlag);
+            activate.setChecked(alarmItem.activatedFlag);
+            volume.setProgress(  alarmItem.alarmVolume);
+            fade.setChecked(alarmItem.fadeInFlag);
+
+        }else{ // otherwise, the user is creating a new alarm
+
+            // Give the default time as the current system time
+            final Calendar deviceCalendar = Calendar.getInstance();
+            String hour = String.valueOf(deviceCalendar.get(Calendar.HOUR_OF_DAY));
+            String minute = String.valueOf(deviceCalendar.get(Calendar.MINUTE));
+            TextView timeTextView = (TextView) findViewById(R.id.alarmTimeText);
+
+            // In the case that hour or minute is equal to "0" or is less than "10" and will not display correctly
+            if (hour.equals("0"))
+            {hour = "00";}
+            else if (Integer.valueOf(hour) < 10)
+            {hour = "0" + hour;}
+            if (minute.equals("0"))
+            {minute = "00";}
+            else if (Integer.valueOf(minute) < 10)
+            {minute = "0" + minute;}
+
+            timeTextView.setText(hour + ":" + minute);
+        }
     }
 
     // Called when the user has hit "OK" to create their alarm
@@ -97,6 +238,14 @@ public class SetAlarmActivity extends AppCompatActivity {
     {
         // Create a new alarm item and add the alarm data
         alarmItem = new AlarmListItem(this, this.alarmManager);
+
+        // If the alarm has been edited, an intent with the position of the alarm in the list should be available
+        Intent intent = getIntent();
+        if(intent.hasExtra("ORDER"))
+        {
+            this.alarmItem.position = intent.getIntExtra("ORDER", 0);
+            this.alarmItem.editedFlag = true;
+        }
 
         // Take primary information from the user
         EditText chosenAlarmName = (EditText) findViewById(R.id.alarmNameText);
@@ -135,8 +284,24 @@ public class SetAlarmActivity extends AppCompatActivity {
         alarmItem.snoozeDuration = "5 Mins";
         alarmItem.fadeInFlag = fade.isChecked();
 
-        SubAudioGenerator sub = new SubAudioGenerator();
-        sub.execute();
+        // Call the AsyncTask Audio Generator to retrieve the audio
+        subAudioGen = new AudioGenerator();
+        subAudioGen.execute();
+
+        // Create a handler and runnable which will cancel the audio generation after 5 secodns
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable()
+        {
+            @Override
+            public void run() {
+                if ( subAudioGen.getStatus() == AsyncTask.Status.RUNNING ) {
+                    subAudioGen.cancel(true);
+                    progressPopup.setTitle("Oops, connection issues ...");
+                    progressPopup.setMessage("Want to choose an offline word?");
+                }
+            }
+        }, 5000 );
+
     }
 
     // User has hit "CANCEL" to cancel their alarm - connected to "CANCEL" button
@@ -334,25 +499,37 @@ public class SetAlarmActivity extends AppCompatActivity {
     }
 
     // Subclass
-    class SubAudioGenerator extends AsyncTask<Void, String, Void>
+    class AudioGenerator extends AsyncTask<Void, String, Void>
     {
-        public String initialLanguage;
-        public String targetLanguage;
-        public String startPhrase;
-        public String endPhrase;
         public String wordOfDay;
-        public String initialWord;
-        public String finalWord;
 
         @Override
         protected void onPreExecute() {
 
-            progress.setTitle("Please Wait");
-            progress.setMessage("Downloading resources...");
-            progress.setCancelable(false);
-            progress.show();
+            progressPopup.setTitle("Please Wait");
+            progressPopup.setMessage("Downloading resources...");
+            progressPopup.setCancelable(true);
+            progressPopup.setButton(DialogInterface.BUTTON_POSITIVE, "Offline", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
 
+                    alarmItem.startPhrase = "banana";
+                    alarmItem.endPhrase = "banana";
+                    alarmItem.initialWordOfDay = "banana";
+                    alarmItem.targetWordOfDay = "banana";
+
+                    dialog.dismiss();
+
+                    // Finally, send an intent to the main activity with the new alarm object
+                    Intent setAlarmOk = new Intent(SetAlarmActivity.this, AlarmListActivity.class);
+                    setAlarmOk.putExtra("ALARM", alarmItem);
+                    setAlarmOk.setFlags(FLAG_ACTIVITY_CLEAR_TOP); // Note, this FLAG_ACTIVITY_CLEAR_TOP flag will ensure that the older AlarmListActivity will receive the intent and be updated. All other activitie above it, including this, will be destroyed
+                    startActivity(setAlarmOk);
+                }
+            });
+            progressPopup.show();
         }
+
         @Override
         protected Void doInBackground(Void... params){
 
@@ -368,8 +545,9 @@ public class SetAlarmActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void result) {
 
-            progress.dismiss();
-
+            if (progressPopup.isShowing()) {
+                progressPopup.dismiss();
+            }
             // If alarm is flagged to be activated, set the alarm
             if (alarmItem.activatedFlag == true)
             {

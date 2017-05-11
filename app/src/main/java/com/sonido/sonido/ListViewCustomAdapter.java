@@ -1,8 +1,21 @@
 package com.sonido.sonido;
 
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +23,9 @@ import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 
 /*----------------------------------------------------------------------------------------------------------------
 * Author: Jonathan Gorman
@@ -22,28 +38,34 @@ import android.widget.TextView;
 public class ListViewCustomAdapter extends BaseAdapter
 {
     LayoutInflater inflater;
-    List<AlarmListItem> items;
+    ArrayList<AlarmListItem> items;
+    Context appContext;
+    private String ALARM_LIST_STORAGE = "Alarm List Storage";
+    private static final String CLASS_TAG = "ListViewCustomAdapter"; // Used for logging purposes
 
-    public ListViewCustomAdapter(Activity context, List<AlarmListItem> items)
+    public ListViewCustomAdapter(Context context, ArrayList<AlarmListItem> items)
     {
         super();
         this.items = items;
         this.inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.appContext = context;
     }
 
     // Overwritten methods for handling the list
     @Override
-    public int getCount()
-    {
+    public int getCount() {
         return items.size();
     }
+
     @Override
-    public Object getItem(int position)
-    {
-        return null;
+    public Object getItem(int position) {
+        return items.get(position);
     }
+
     @Override
-    public long getItemId(int position) {return 0;}
+    public long getItemId(int position) {
+        return position;
+    }
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent)
@@ -157,7 +179,6 @@ public class ListViewCustomAdapter extends BaseAdapter
             }
         }
 
-
         if (items.get(position).targetLanguage != null) {
             // Set the language images
             ImageButton targetLanguageImage = (ImageButton) vi.findViewById(R.id.alarmTargetLanguageSmall);
@@ -203,6 +224,53 @@ public class ListViewCustomAdapter extends BaseAdapter
                     break;
             }
         }
+
+        // set logic for editing the alarm
+        ImageButton editButton = (ImageButton) vi.findViewById(R.id.editAlarm);
+        editButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            AlertDialog alertDialog = new AlertDialog.Builder(v.getContext()).create();
+            alertDialog.setTitle("Editing Alarm");
+
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL,"Cancel", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    // Does nothing
+                }
+            });
+
+            alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,"Delete", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+
+                    // Delete the selected item and refresh the list
+                    items.remove(getItem(position));
+                    items.get((int)getItemId(position)).cancelAlarm();
+
+                    notifyDataSetChanged();
+                    saveAlarmList();
+                }
+            });
+
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE,"Edit", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+
+                    System.out.println("Editing alarm number: " + getItemId(position));
+
+                    // Finally, send an intent with the edited alarm object
+                    Intent editAlarmIntent = new Intent(appContext, SetAlarmActivity.class);
+                    editAlarmIntent.putExtra("EDIT_ALARM", items.get((int)getItemId(position)));
+                    editAlarmIntent.putExtra("ORDER", (int)getItemId(position));
+                    editAlarmIntent.setFlags(FLAG_ACTIVITY_CLEAR_TOP); // Note, this FLAG_ACTIVITY_CLEAR_TOP flag will ensure that the older AlarmListActivity will receive the intent and be updated. All other activitie above it, including this, will be destroyed
+                    appContext.startActivity(editAlarmIntent);
+
+                }
+            });
+
+            alertDialog.show();  //<-- See This!
+        }
+        });
+
         return vi;
     }
 
@@ -211,6 +279,58 @@ public class ListViewCustomAdapter extends BaseAdapter
         items.clear();
         items.addAll(newAlarmList);
         this.notifyDataSetChanged();
+    }
+
+    // Saves the alarm list data - uses internal storage
+    public void saveAlarmList() {
+        try {
+            FileOutputStream fos = this.appContext.openFileOutput(ALARM_LIST_STORAGE, Context.MODE_PRIVATE);
+            ObjectOutputStream of = new ObjectOutputStream(fos);
+            of.writeObject(items);
+            of.flush();
+            of.close();
+            fos.close();
+            Log.v("Custom Adapter", "2) Alarm list saved - saved " + items.size() + " alarms");
+        } catch (Exception e) {
+            Log.e("InternalStorage", e.getMessage());
+        }
+    }
+
+    // Saves the alarm list data - uses internal storage
+    public void resetAlarmList() {
+        try {
+            FileOutputStream fos = this.appContext.openFileOutput(ALARM_LIST_STORAGE, Context.MODE_PRIVATE);
+            ObjectOutputStream of = new ObjectOutputStream(fos);
+            items.clear();
+            of.writeObject(items);
+            of.flush();
+            of.close();
+            fos.close();
+            Log.v(CLASS_TAG, "2) Alarm list reset - currently " + items.size() + " alarms");
+        } catch (Exception e) {
+            Log.e("InternalStorage", e.getMessage());
+        }
+
+        // Then notify the adapter that the list has changed
+        updateAlarmList(items);
+    }
+
+    // Loads the alarm list data - uses internal storage
+    public void loadAlarmList() {
+        try {
+            FileInputStream fis = this.appContext.openFileInput(ALARM_LIST_STORAGE);
+            ObjectInputStream oi = new ObjectInputStream(fis);
+            items = (ArrayList<AlarmListItem>) oi.readObject();
+            oi.close();
+            Log.v(CLASS_TAG, "2) Alarm list loaded - loaded " + items.size() + " alarms");
+
+        } catch (FileNotFoundException e) {
+            Log.e("InternalStorage", e.getMessage());
+        } catch (IOException e) {
+            Log.e("InternalStorage", e.getMessage());
+        } catch (ClassNotFoundException e) {
+            Log.e("InternalStorage", e.getMessage());
+        }
     }
 
 }
