@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.Calendar;
@@ -63,7 +65,13 @@ public class AlarmSounding extends AppCompatActivity implements TextToSpeech.OnI
 
         // Set view and any variable parts of the view
         setContentView(R.layout.alarm_sounding);
-        TextView currentTimeText = (TextView) findViewById(R.id.currentTime);
+        TextView currentTimeText = (TextView) findViewById(R.id.alarmTimeView);
+        TextView initialWordOfDayTextView = (TextView) findViewById(R.id.initialTextView);
+        TextView targetWordOfDayTextView = (TextView) findViewById(R.id.targetTextView);
+
+        initialWordOfDayTextView.setText(this.initialWordOfDay);
+        targetWordOfDayTextView.setText(this.targetWordOfDay);
+
         Calendar currCal = Calendar.getInstance();
         String hour = String.valueOf(currCal.get(Calendar.HOUR_OF_DAY)); // HOUR_OF_DAY ensures 24 hour clock is used
         String minute = String.valueOf(currCal.get(Calendar.MINUTE));
@@ -73,6 +81,94 @@ public class AlarmSounding extends AppCompatActivity implements TextToSpeech.OnI
         {minute = "0" + String.valueOf(minute);}
         currentTimeText.setText(hour + ":" + minute);
 
+        // Set the language images
+        ImageView initialLanguageImage = (ImageView) findViewById(R.id.initialFlag);
+        switch (initialLanguage) {
+            case "englishButton":
+                initialLanguageImage.setImageResource(R.mipmap.englishiconsmall);
+                break;
+            case "spanishButton":
+                initialLanguageImage.setImageResource(R.mipmap.spanishiconsmall);
+                break;
+            case "frenchButton":
+                initialLanguageImage.setImageResource(R.mipmap.frenchiconsmall);
+                break;
+            case "germanButton":
+                initialLanguageImage.setImageResource(R.mipmap.germaniconsmall);
+                break;
+            case "chineseButton":
+                initialLanguageImage.setImageResource(R.mipmap.chineseiconsmall);
+                break;
+            case "indianButton":
+                initialLanguageImage.setImageResource(R.mipmap.indianiconsmall);
+                break;
+            case "italianButton":
+                initialLanguageImage.setImageResource(R.mipmap.italianiconsmall);
+                break;
+            case "polishButton":
+                initialLanguageImage.setImageResource(R.mipmap.polishiconsmall);
+                break;
+            case "russianButton":
+                initialLanguageImage.setImageResource(R.mipmap.russianiconsmall);
+                break;
+            case "swedishButton":
+                initialLanguageImage.setImageResource(R.mipmap.swedishiconsmall);
+                break;
+            case "portugeseButton":
+                initialLanguageImage.setImageResource(R.mipmap.portugeseiconsmall);
+                break;
+            case "japaneseButton":
+                initialLanguageImage.setImageResource(R.mipmap.japaneseiconsmall);
+                break;
+            default:
+                initialLanguageImage.setImageResource(R.mipmap.irishiconsmall);
+                break;
+        }
+
+        // Set the language images
+        ImageView targetLanguageImage = (ImageView) findViewById(R.id.targetFlag);
+        switch (targetLanguage)
+        {
+            case "englishButton":
+                targetLanguageImage.setImageResource(R.mipmap.englishiconsmall);
+                break;
+            case "spanishButton":
+                targetLanguageImage.setImageResource(R.mipmap.spanishiconsmall);
+                break;
+            case "frenchButton":
+                targetLanguageImage.setImageResource(R.mipmap.frenchiconsmall);
+                break;
+            case "germanButton":
+                targetLanguageImage.setImageResource(R.mipmap.germaniconsmall);
+                break;
+            case "chineseButton":
+                targetLanguageImage.setImageResource(R.mipmap.chineseiconsmall);
+                break;
+            case "indianButton":
+                targetLanguageImage.setImageResource(R.mipmap.indianiconsmall);
+                break;
+            case "italianButton":
+                targetLanguageImage.setImageResource(R.mipmap.italianiconsmall);
+                break;
+            case "polishButton":
+                targetLanguageImage.setImageResource(R.mipmap.polishiconsmall);
+                break;
+            case "russianButton":
+                targetLanguageImage.setImageResource(R.mipmap.russianiconsmall);
+                break;
+            case "swedishButton":
+                targetLanguageImage.setImageResource(R.mipmap.swedishiconsmall);
+                break;
+            case "portugeseButton":
+                targetLanguageImage.setImageResource(R.mipmap.portugeseiconsmall);
+                break;
+            case "japaneseButton":
+                targetLanguageImage.setImageResource(R.mipmap.japaneseiconsmall);
+                break;
+            default:
+                targetLanguageImage.setImageResource(R.mipmap.irishiconsmall);
+                break;
+        }
         tts = new TextToSpeech(AlarmSounding.this , this);
     }
 
@@ -115,7 +211,6 @@ public class AlarmSounding extends AppCompatActivity implements TextToSpeech.OnI
                             tts.setSpeechRate(FULL_SPEECH_RATE);
                             tts.setLanguage(new Locale(findLocale(initialLanguage)));
                             tts.speak(endPhrase + ":" + initialWordOfDay, TextToSpeech.QUEUE_ADD, null);
-
                         }
                     }
                 }

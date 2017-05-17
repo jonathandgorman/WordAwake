@@ -132,10 +132,10 @@ public class AlarmListItem implements Serializable
             // Add intent to pendingIntent and ensure that it is only set once - and then just updated
             pendingAlarmIntent = PendingIntent.getBroadcast(this.context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-            // Alarm is scheduled to sound at EXACTLY the time mentioned and WAKEUP the device, then REPEATING at the shown interval
-            this.alarmManager.set(AlarmManager.RTC_WAKEUP,
-                    alarmCalendar.getTimeInMillis(),
-                    pendingAlarmIntent);
+            // Sets the alarmClock for the specified time and using the specified pending intent
+            this.alarmManager.setAlarmClock(
+                    new AlarmManager.AlarmClockInfo(alarmCalendar.getTimeInMillis(),
+                            this.pendingAlarmIntent), this.pendingAlarmIntent);
 
             // Create a toast notification to say that the alarm is activated and when it will activate
             if (numberOfDays > 0)
